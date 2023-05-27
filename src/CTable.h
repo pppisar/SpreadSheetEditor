@@ -3,6 +3,7 @@
 
 #include <map>
 
+#include "CConstants.h"
 #include "CCell.h"
 
 class CTable {
@@ -11,13 +12,19 @@ public:
 
     CTable(const CTable & src);
 
-    ~CTable();
+    virtual ~CTable();
+
+    // Setter
+    void setCell(CPosition position, std::string & expression);
+
+    bool checkCell(CPosition position) const;
 
     // Getter
-    CCell * getCell(int x, int y) const;
+    CCell * getCell(CPosition position) const;
 private:
-    std::map<std::pair<int, int>, CCell*> m_table;
-};
+    int m_id = 0;
 
+    std::map<CPosition, CCell*> m_table;
+};
 
 #endif //PYSAROLE_CTABLE_H

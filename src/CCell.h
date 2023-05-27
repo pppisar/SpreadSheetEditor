@@ -1,11 +1,15 @@
 #ifndef PYSAROLE_CCELL_H
 #define PYSAROLE_CCELL_H
 
+#include "CConstants.h"
 #include <string>
+#include <set>
 
 class CCell {
 public:
-    CCell() = default;
+    CCell(int id,
+          std::string & newExpression, std::string & newValue,
+          bool isNumeric);
 
     CCell(const CCell & src);
 
@@ -19,17 +23,14 @@ public:
     virtual std::string getExpression() const;
 
     // Setter
-    virtual bool update(std::string input);
+    virtual void update(std::string & newExpression, std::string & newValue,
+                        bool isNumeric);
 
-    // Processing of expression(only text)
-    virtual void process();
-
-protected:
+private:
+    int m_id;
     std::string m_value;
     std::string m_expression;
-private:
-
+    bool m_isNumeric;
+    std::set<CPosition> m_dependences;
 };
-
-
 #endif //PYSAROLE_CCELL_H

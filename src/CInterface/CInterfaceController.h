@@ -2,23 +2,26 @@
 #define PYSAROLE_CINTERFACECONTROLLER_H
 
 #include <ncurses.h>
+#include <string>
 
 class CInterfaceController {
 public:
     CInterfaceController() = default;
 
-    ~CInterfaceController() = default;
+    virtual ~CInterfaceController() = default;
+
+    virtual void reset() = 0;
 
     // Standard navigation
-    virtual void action(int actKey);
+    virtual void action(int actKey) = 0;
 
     // Function to display information to the console.
-    virtual void render() const = 0;
+    virtual void display() = 0;
 
 private:
-    int m_screenWidth;
-    int m_screenHeight;
-    int m_contentHeight;
+    virtual void renderHeader() const = 0;
+    virtual void renderBody() const = 0;
+    virtual void renderFooter() const = 0;
 };
 
 

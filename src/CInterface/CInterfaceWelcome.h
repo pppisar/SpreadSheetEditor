@@ -1,25 +1,31 @@
 #ifndef PYSAROLE_CINTERFACEWELCOME_H
 #define PYSAROLE_CINTERFACEWELCOME_H
 
+#include "../CConstants.h"
 #include "CInterfaceController.h"
 
 class CInterfaceWelcome : public CInterfaceController {
 public:
     CInterfaceWelcome() = default;
 
-    ~CInterfaceWelcome() = default;
+    virtual ~CInterfaceWelcome() = default;
+
+    void reset() override;
 
     // Navigating the start menu
     void action(int actKey) override;
 
     // (re)Render welcome page
-    void render() const override;
-private:
-    int m_CREATE_NEW_TABLE = 0;
-    int m_OPEN_EXISTING_TABLE = 1;
-    int m_EXIT_APPLICATION = 2;
+    void display() override;
 
-    int m_selectedElement = m_CREATE_NEW_TABLE;
+    // Get selected item
+    unsigned getSelected() const;
+private:
+    void renderHeader() const override;
+    void renderBody() const override;
+    void renderFooter() const override;
+
+    unsigned m_selected = 0;
 };
 
 

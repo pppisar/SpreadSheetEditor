@@ -6,6 +6,7 @@ CParser::CParser(const std::string &expression) {
 
 bool CParser::process() {
     // TODO: Parsing and executing an expression if the syntax is correct
+    return true;
 }
 
 // TODO: implementation of math and text functions
