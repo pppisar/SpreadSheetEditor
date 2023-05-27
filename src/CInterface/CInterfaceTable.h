@@ -48,6 +48,8 @@ private:
 
     void renderGrid() const;
 
+    void higlightSelected() const;
+
     // Render Rows and Colums title
     void renderRCTitle() const;
 

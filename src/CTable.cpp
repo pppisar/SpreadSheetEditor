@@ -37,3 +37,7 @@ CCell* CTable::getCell(CPosition position) const {
     }
     return it->second;
 }
+
+void CTable::evaluate() {
+    
+}

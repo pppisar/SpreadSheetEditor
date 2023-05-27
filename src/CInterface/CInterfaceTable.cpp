@@ -68,7 +68,7 @@ void CInterfaceTable::renderHeader() const {
 }
 
 void CInterfaceTable::renderGrid() const {
-    init_pair(1, COLOR_CYAN, COLOR_BLACK);
+    init_pair(1, COLOR_BLUE, COLOR_BLACK);
     for (int i = 0; i < m_rowCount; i++) {
         if (i == m_posY || i == m_posY + 1)
             attron(COLOR_PAIR(1));
@@ -83,6 +83,37 @@ void CInterfaceTable::renderGrid() const {
         vline(0, m_tableHeight);
         attroff(COLOR_PAIR(1));
     }
+    higlightSelected();
+}
+
+void CInterfaceTable::higlightSelected() const {
+    init_pair(2, COLOR_CYAN, COLOR_BLACK);
+    attron(COLOR_PAIR(2));
+    mvaddch(TABLE_START_POSITION_Y + m_posY * CELL_HEIGHT,
+            TABLE_START_POSITION_X + m_posX * CELL_WIDTH,
+            ACS_ULCORNER);
+    mvaddch(TABLE_START_POSITION_Y + (m_posY + 1) * CELL_HEIGHT,
+            TABLE_START_POSITION_X + m_posX * CELL_WIDTH,
+            ACS_LLCORNER);
+    mvaddch(TABLE_START_POSITION_Y + m_posY * CELL_HEIGHT,
+            TABLE_START_POSITION_X + (m_posX + 1) * CELL_WIDTH,
+            ACS_URCORNER);
+    mvaddch(TABLE_START_POSITION_Y + (m_posY + 1) * CELL_HEIGHT,
+            TABLE_START_POSITION_X + (m_posX + 1) * CELL_WIDTH,
+            ACS_LRCORNER);
+    move(TABLE_START_POSITION_Y + m_posY * CELL_HEIGHT + 1,
+        TABLE_START_POSITION_X + m_posX * CELL_WIDTH);
+    vline(0, CELL_HEIGHT - 1);
+    move(TABLE_START_POSITION_Y + m_posY * CELL_HEIGHT + 1,
+        TABLE_START_POSITION_X + (m_posX + 1) * CELL_WIDTH);
+    vline(0, CELL_HEIGHT - 1);
+    move(TABLE_START_POSITION_Y + m_posY * CELL_HEIGHT,
+        TABLE_START_POSITION_X + m_posX * CELL_WIDTH + 1);
+    hline(0, CELL_WIDTH - 1);
+    move(TABLE_START_POSITION_Y + (m_posY + 1) * CELL_HEIGHT,
+        TABLE_START_POSITION_X + m_posX * CELL_WIDTH + 1);
+    hline(0, CELL_WIDTH - 1);
+    attroff(COLOR_PAIR(2));
 }
 
 void CInterfaceTable::renderRCTitle() const {
@@ -182,11 +213,11 @@ void CInterfaceTable::display() {
 }
 
 void CInterfaceTable::changePosition(int x, int y) {
-    if (m_posX + x > m_columnCount - 1)
+    if (m_posX + x > m_columnCount - 2)
         m_startX++;
     else if (m_posX + x < 0 && m_startX > 0)
         m_startX--;
-    else if (m_posY + y > m_rowCount - 1)
+    else if (m_posY + y > m_rowCount - 2)
         m_startY++;
     else if (m_posY + y < 0 && m_startY > 0)
         m_startY--;

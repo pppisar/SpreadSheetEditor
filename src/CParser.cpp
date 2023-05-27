@@ -1,6 +1,6 @@
 #include "CParser.h"
 
-CParser::CParser(const std::string &expression) {
+void CParser::setExpression(std::string expression) {
     m_expression = expression;
 }
 

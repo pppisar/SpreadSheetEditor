@@ -5,7 +5,11 @@
 
 class CParser {
 public:
-    CParser(const std::string & expression);
+    CParser() = default;
+
+    ~CParser() = default;
+
+    void setExpression(std::string expression);
 
     bool process();
 private:

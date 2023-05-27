@@ -5,6 +5,7 @@
 
 #include "CConstants.h"
 #include "CCell.h"
+#include "CParser.h"
 
 class CTable {
 public:
@@ -21,8 +22,12 @@ public:
 
     // Getter
     CCell * getCell(CPosition position) const;
+
+    void evaluate(); 
 private:
     int m_id = 0;
+
+    CParser m_parser;
 
     std::map<CPosition, CCell*> m_table;
 };
