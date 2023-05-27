@@ -1,1 +1,1 @@
-###Tabulkovy Editor
+## SpreadSheet Editor (Tabulkový editor)

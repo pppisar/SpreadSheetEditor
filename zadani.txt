@@ -1,0 +1,66 @@
+                                        ZADÁNÍ
+Cílem semestrální práce je vytvořit interaktivní aplikaci, konkrétně jednoduchý editor tabulek.
+
+Vytvořený editor tabulek by měl:
+- umět pracovat s čísly a řetězci;
+- provádět základní operace s čísly (sčítání, odčítání, násobení a dělení);
+- implementovat základní operace s řetězci (spojování, opakování);
+- mít alespoň tři matematické funkce (sinus, kosinus, absolutní hodnota, odmocnina);
+- vypisovat tabulky, její výsledné hodnoty a vzorce;
+- umět uložit tabulku do souboru v čitelné podobě a obnovit stav tabulky ze souboru.
+
+Pokud je v buňce tabulky zapsán vzorec, pak by se při aktualizaci buněk, na které
+vzorec odkazuje, měla aktualizovat i výsledná hodnota. Měla by být rovněž zavedena
+prevence referenčních smyček mezi buňkami.
+
+Zpracování výrazů bude implementováno v souladu s následující požadavkou:
+- Všechny standardní operace musí být implementovány s rozpoznáváním vnoření pomocí závorek,
+  například: (("w" * A3) . ".cvut.cz").
+
+Ukázka běhu programu: (nezávazný příklad)
+
+IMPORT data.csv // saves A1 = 5
+FORMULA [A1 : D10] // print table from A1 to D10 with formulas showing
+A3 = 3
+B3 = ("w" * A3) . ".cvut.cz"
+FORMULA B3 // print '= ("w" * A3) . ".cvut.cz"'
+PRINT B3 // print 'www.cvut.cz'
+A3 = A1
+PRINT B3 // print 'wwwww.cvut.cz'
+EXPORT data.csv
+
+                                        POLYMORFISMUS
+V tomto projektu se plánuje implementace nejméně 4 samostatných stromů dědičnosti.
+
+Jak bylo popsáno dříve, každá buňka může obsahovat buď obyčejný řetězec, nebo vzorec.
+Zatím jsem se rozhodl vytvořit třídu CCell, která bude obsahovat obecné informace a
+metody pro oba typy buněk.
+
+Funkce ukládání tabulky do souboru a čtení stavu ze souboru je rovněž implementována pomocí polymorfismu.
+Bylo vytvořeno generickou třídu CStateManager, která obsahuje dvě abstraktní metody saveState a loadState.
+Dále vytvořím třídy CStateManagerBinary, CStateManagerText a CStateManagerJson, které dědí z CStateManager
+a implementují funkce ukládání a načítání tabulky podle příslušného typu souboru.
+         +-------------+
+    +----+CStateManager+---+
+    |    +------+------+   |
+    |           |          |
++---+--+      +-+--+     +-+--+
+|Binary|      |JSON|     |Text|
++------+      +----+     +----+
+
+Posledním prvkem, kde bylo rozhodnuto o použití polymorfismu, je uživatelské rozhraní.
+Implementace spočívá ve vytvoření několika vrstev rozhraní, a to:
+- Úvodní stránka aplikace (s možností vytvořit novou tabulku nebo načíst stávající);
+- Stránka samotného projektu (tabulky), kde se provádí její editace;
+- Stránka menu (kde lze vytvořit novou tabulku, uložit;
+  její aktuální verzi nebo načíst stávající. Lze také celou aplikaci zavřít);
+  Stránka nabídky je dostupná pouze ze stránky projektu.
+- Stránka s chybovým hlášením;
+- Stránka s informacemi o tom, jak používat dostupné funkce aplikace.
+                 +--------------------+       
+    +------+-----+CInterfaceController+-----+  
+    |      |     +---------+----------+     |  
+    |      |               |                |  
++--+-+ +---+---+        +--+--+          +--+-+
+|Menu| |Welcome|        |Table|          |Help|
++----+ +-------+        +-----+          +----+
