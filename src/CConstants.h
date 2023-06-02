@@ -17,17 +17,17 @@ typedef std::pair<unsigned, char> Operator;
 typedef std::pair<bool, std::string> execRes;
 
 // Screens constants
-const unsigned SCREEN_WELCOME = 0;
-const unsigned SCREEN_HELP = 1;
-const unsigned SCREEN_TABLE = 2;
-const unsigned SCREEN_MENU = 3;
+const int SCREEN_WELCOME = 0;
+const int SCREEN_HELP = 1;
+const int SCREEN_TABLE = 2;
+const int SCREEN_MENU = 3;
 
 // Menu constants
-const unsigned MENU_CREATE = 0;
-const unsigned MENU_LOAD = 1;
-const unsigned MENU_SAVE = 2;
-const unsigned MENU_SAVE_AS = 3;
-const unsigned MENU_EXIT = 4;
+const int MENU_CREATE = 0;
+const int MENU_LOAD = 1;
+const int MENU_SAVE = 2;
+const int MENU_SAVE_AS = 3;
+const int MENU_EXIT = 4;
 
 // Table constants
 const unsigned CELL_WIDTH = 10;

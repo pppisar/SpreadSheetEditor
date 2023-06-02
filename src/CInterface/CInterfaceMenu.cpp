@@ -12,7 +12,7 @@ void CInterfaceMenu::action(int actKey) {
             renderBody();
             break;
         case KEY_DOWN:
-            if (m_selected + 1 <= 3)
+            if (m_selected + 1 <= 4)
                 m_selected += 1;
             renderBody();
             break;
@@ -27,7 +27,7 @@ void CInterfaceMenu::renderHeader() const {
 }
 
 void CInterfaceMenu::renderBody() const {
-    for (unsigned i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++) {
         if (i == m_selected)
             wattron(stdscr, A_REVERSE);
         mvprintw(i + 2, 0, "%s", CHOICES_MENU[i].c_str());

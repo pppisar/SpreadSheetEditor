@@ -7,7 +7,7 @@ void CInterfaceWelcome::reset() {
 void CInterfaceWelcome::action(int actKey) {
     switch (actKey) {
         case KEY_UP:
-            if ((int)(m_selected - 1) >= 0)
+            if (m_selected - 1 >= 0)
                 m_selected -= 1;
             renderBody();
             break;
@@ -27,7 +27,7 @@ void CInterfaceWelcome::renderHeader() const {
 }
 
 void CInterfaceWelcome::renderBody() const {
-    for (unsigned i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++) {
         if (i == m_selected)
             wattron(stdscr, A_REVERSE);
         mvprintw(i + 2, 0, "%s", CHOICES_WELCOME[i].c_str());

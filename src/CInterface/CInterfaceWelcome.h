@@ -25,7 +25,7 @@ private:
     void renderBody() const override;
     void renderFooter() const override;
 
-    unsigned m_selected = 0;
+    int m_selected = 0;
 };
 
 

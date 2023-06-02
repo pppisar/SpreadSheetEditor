@@ -243,10 +243,10 @@ ParseResult CParser::process(std::string expression) {
         }
     }
     else
-        values.push(getValue(expression))
+        values.push(getValue(expression));
 
     mvprintw(1,0,"Exp: %s | Val: %s | isError: %d", expression.c_str(), resValue.c_str(), (int)isError);
-    return std::make_pair(std::make_pair(values.top().first, isError), values.top().second;);
+    return std::make_pair(std::make_pair(values.top().first, isError), values.top().second);
 }
 
 void CParser::toUpperCase(std::string& text) {

@@ -1,5 +1,3 @@
-
-
 #include "CLifeCycle.h"
 
 CLifeCycle::CLifeCycle() {
@@ -56,7 +54,6 @@ void CLifeCycle::run() {
     int terminalWidth, terminalHeight;
 
     while (true) {
-
         // Get the key that the user pressed.
         inpChar = getch();
 
@@ -79,9 +76,10 @@ void CLifeCycle::run() {
                 break;
             case 27: // Esc button => menu page
                 if (m_currentScreen != SCREEN_WELCOME) {
-                    if (m_currentScreen == SCREEN_HELP ||
-                        m_currentScreen == SCREEN_MENU)
+                    if (m_currentScreen == SCREEN_HELP)
                         changeScreen(m_previousScreen);
+                    else if (m_currentScreen == SCREEN_MENU)
+                        changeScreen(SCREEN_TABLE);
                     else {
                         m_allScreens[SCREEN_MENU]->reset();
                         changeScreen(SCREEN_MENU);
@@ -104,7 +102,23 @@ void CLifeCycle::run() {
                             case MENU_EXIT:
                                 return;
                         }
-                    };
+                    }
+                    else if (m_currentScreen == SCREEN_MENU) {
+                        switch (m_menuInterface->getSelected()) {
+                        case MENU_CREATE:
+                            break;
+                        case MENU_LOAD:
+                            break;
+                        case MENU_SAVE:
+                            break;
+                        case MENU_SAVE_AS:
+                            break;
+                        case MENU_EXIT:
+                            return;
+                        default:
+                            break;
+                        }
+                    }
                 }
                 break;
             default:
