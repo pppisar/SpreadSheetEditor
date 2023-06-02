@@ -43,7 +43,7 @@ private:
 
     Position getCellPosition(std::string link) const;
 
-    unsigned getPriority(char op) const;
+    unsigned getPriority(std::string op) const;
 
     Value getValue(std::string value) const;
 };

@@ -12,7 +12,7 @@ typedef std::pair<std::pair<bool, bool>, std::string> ParseResult;
 //               isNum,      value
 typedef std::pair<bool, std::string> Value;
 //                priority, operator
-typedef std::pair<unsigned, char> Operator;
+typedef std::pair<unsigned, std::string> Operator;
 //               isErr,      value
 typedef std::pair<bool, std::string> execRes;
 

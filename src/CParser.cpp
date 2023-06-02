@@ -77,53 +77,12 @@ ParseResult CParser::process(std::string expression) {
                         if (!isalnum(expression[expPosEnd]))
                             break;
                     if (expPosEnd != expLength && expression[expPosEnd] == '(') {
-                        expPosEnd++;
                         std::string func = expression.substr(expPosStart, expPosEnd - expPosStart);
                         toUpperCase(func);
                         if (isFunction(func)) {
+                            operators.push(std::make_pair(0, func));
+                            prevIsOper = true;
                             expPosStart = expPosEnd;
-                            for (; expPosEnd < expLength; expPosEnd++)
-                                if (expression[expPosEnd] == ')')
-                                    break;
-                            if (expPosEnd != expLength) {
-                                std::string value = expression.substr(expPosStart, expPosEnd - expPosStart);
-                                toUpperCase(value);
-                                if (isNumeric(value)) {
-                                    Value resEval = std::make_pair(false, "");
-                                    if (!execFunction(func, value, resEval))
-                                        values.push(resEval);
-                                    else {
-                                        isError = true;
-                                        resValue = "BadFunArg";
-                                        break;
-                                    }
-                                }
-                                else if (isValidCell(value) && 
-                                        isNumeric(m_table->getCell(getCellPosition(value))->getValString())) {
-                                            Value resEval = std::make_pair(false, "");
-                                            if (!execFunction(func, 
-                                                              m_table->getCell(getCellPosition(value))->getValString(),
-                                                              resEval))
-                                                values.push(resEval);
-                                            else {
-                                                isError = true;
-                                                resValue = "BadFunArg";
-                                                break;
-                                            }
-                                        }
-                                else {
-                                    isError = true;
-                                    resValue = "BadFunArg";
-                                    break;
-                                }
-                                expPosStart = expPosEnd;
-                                prevIsOper = false;
-                            }
-                            else {
-                                isError = true;
-                                resValue = "BadSyntax";
-                                break;
-                            }
                         }
                         else {
                             isError = true;
@@ -157,7 +116,7 @@ ParseResult CParser::process(std::string expression) {
             }
             else if (expression[expPosStart] == '(') {
                 if (prevIsOper)
-                    operators.push(std::make_pair(5, '('));
+                    operators.push(std::make_pair(0, "("));
                 else {
                     isError = true;
                     resValue = "BadSyntax";
@@ -166,7 +125,9 @@ ParseResult CParser::process(std::string expression) {
             }
             else if (expression[expPosStart] == ')') {
                 if (!prevIsOper && !operators.empty()) {
-                    while (!operators.empty() && operators.top().second != '(' && values.size() >= 2) {
+                    while (!operators.empty() && 
+                    (operators.top().second != "(" || !isFunction(operators.top().second)) && 
+                    values.size() >= 2) {
                         Operator op = operators.top();
                         operators.pop();
                         Value val2 = values.top();
@@ -185,6 +146,7 @@ ParseResult CParser::process(std::string expression) {
                     if (!isError && (operators.empty() || values.size() < 2)) {
                         isError = true;
                         resValue = "BadSyntax";
+                        break;
                     }
                     if (isError)
                         break;
@@ -197,13 +159,15 @@ ParseResult CParser::process(std::string expression) {
                 }
             }
             else if (isOperator(expression[expPosStart])) {
-                if (operators.empty() || (operators.top().second == '(' && 
+                if (operators.empty() || (
+                    (operators.top().second == "(" || isFunction(operators.top().second)) && 
                     (expression[expPosStart] == '+' || expression[expPosStart] == '-'))) {
                         values.push(getValue("0"));
-                        operators.push(std::make_pair(4, expression[expPosStart]));
+                        operators.push(std::make_pair(4, std::to_string(expression[expPosStart])));
                 }
                 else if (!prevIsOper) {
-                    Operator currentOp = std::make_pair(getPriority(expression[expPosStart]), expression[expPosStart]);
+                    Operator currentOp = std::make_pair(getPriority(std::to_string(expression[expPosStart])), 
+                                                        std::to_string(expression[expPosStart]));
                     
                     while (!operators.empty() && operators.top().first > currentOp.first && values.size() >= 2) {
                         Operator op = operators.top();
@@ -221,13 +185,13 @@ ParseResult CParser::process(std::string expression) {
                             break;
                         }
                     }
-                    if (!isError && (operators.empty() || values.size() < 2)) {
-                        isError = true;
-                        resValue = "BadSyntax";
-                    }
+                    // if (!isError && (operators.empty() || values.size() < 2)) {
+                    //     isError = true;
+                    //     resValue = "BadSyntax";
+                    // }
                     if (isError)
                         break;
-                    operators.pop();
+                    operators.push(currentOp);
                 }
                 else {
                     isError = true;
@@ -266,9 +230,7 @@ bool CParser::execOperator(Operator& op,
                            Value& resEval) {
     bool error = false;
     std::string res;
-    switch (op.second)
-    {
-    case '+':
+    if (op.second == "+") {
         if (argument1.first && argument2.first)
             res = std::to_string(std::stod(argument1.second) + std::stod(argument2.second));
         else if (!argument1.first && !argument2.first)
@@ -277,16 +239,16 @@ bool CParser::execOperator(Operator& op,
             error = true;
             res = "BadLogic";
         }
-        break;
-    case '-':
+    }
+    else if (op.second == "-") {
         if (argument1.first && argument2.first)
             res = std::to_string(std::stod(argument1.second) - std::stod(argument2.second));
         else {
             error = true;
             res = "BadLogic";
         }
-        break;
-    case '*':
+    }
+    else if (op.second == "*") {
         if (argument1.first && argument2.first)
             res = std::to_string(std::stod(argument1.second) * std::stod(argument2.second));
         else if (!argument1.first && argument2.first && isInteger(argument2.second))
@@ -297,8 +259,8 @@ bool CParser::execOperator(Operator& op,
             error = true;
             res = "BadLogic";
         }
-        break;
-    case '/':
+    }
+    else if (op.second == "/") {
         if (argument1.first && argument2.first && 
             isInteger(argument2.second) && std::stod(argument2.second) != 0)
                 res = std::to_string(std::stoi(argument1.second) - std::stoi(argument2.second));
@@ -306,8 +268,8 @@ bool CParser::execOperator(Operator& op,
             error = true;
             res = "BadLogic";
         }
-        break;
-    case '^':
+    }
+    else if (op.second == "^") {
         if (argument1.first && argument2.first && 
             isInteger(argument1.second) && std::stoi(argument1.second) == 0 && 
             std::stod(argument2.second) < 0) {
@@ -320,8 +282,8 @@ bool CParser::execOperator(Operator& op,
             error = true;
             res = "BadLogic";
         }
-        break;
-    case '%':
+    }
+    else if (op.second == "%") {
         if (argument1.first && argument2.first && 
             isInteger(argument1.second) && isInteger(argument2.second) && 
             std::stoi(argument2.second) != 0)
@@ -330,17 +292,14 @@ bool CParser::execOperator(Operator& op,
             error = true;
             res = "BadLogic";
         }
-        break;
-    default:
-        break;
     }
     return error;
 }
 
 bool CParser::isFunction(const std::string& function) const {
-    return (function == "ABS(" ||
-            function == "SIN(" || function == "COS(" ||
-            function == "LN(" || function == "EXP(");
+    return (function == "ABS" ||
+            function == "SIN" || function == "COS" ||
+            function == "LN" || function == "EXP");
 }
 
 bool CParser::execFunction(const std::string& function, 
@@ -348,13 +307,13 @@ bool CParser::execFunction(const std::string& function,
                            Value& resEval) {
     bool error = false;
     std::string res;
-    if (function == "ABS(")
+    if (function == "ABS")
         res = std::to_string(abs(std::stod(argument)));
-    else if (function == "SIN(")
+    else if (function == "SIN")
         res = std::to_string(sin(std::stod(argument)));
-    else if (function == "COS(")
+    else if (function == "COS")
         res = std::to_string(cos(std::stod(argument)));
-    else if (function == "LN(") {
+    else if (function == "LN") {
         if (std::stod(argument) > 0)
             res = std::to_string(log(std::stod(argument)));
         else {
@@ -362,7 +321,7 @@ bool CParser::execFunction(const std::string& function,
             error = true;
         }
     }
-    else if (function == "EXP(")
+    else if (function == "EXP")
         res = std::to_string(exp(std::stod(argument)));
 
     resEval.first = isNumeric(res);
@@ -418,14 +377,17 @@ Position CParser::getCellPosition(std::string link) const {
     return std::make_pair(x, y);
 }
 
-unsigned CParser::getPriority(char op) const {
-    if (op == '+' || op == '-')
+unsigned CParser::getPriority(std::string op) const {
+    if (op == "+" || op == "-")
         return 1;
-    else if (op == '*' || op == '/')
+    else if (op == "*" || op == "/")
         return 2;
-    else if (op == '^' || op == '%')
+    else if (op == "^" || op == "%")
         return 3;
-    return 0;
+    else // (op == "SIN" || op == "COS"
+         //  || op == "ABS"
+         //  || op == "LN" || op == "EXP")
+        return 0;
 }
 
 Value CParser::getValue(std::string value) const {
