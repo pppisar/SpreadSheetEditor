@@ -5,7 +5,6 @@
 
 #include "CConstants.h"
 #include "CCell.h"
-#include "CParser.h"
 
 class CTable {
 public:
@@ -16,20 +15,20 @@ public:
     virtual ~CTable();
 
     // Setter
-    void setCell(CPosition position, std::string & expression);
+    void setCell(Position position, 
+                 std::string & expression,
+                 ParseResult& info);
 
-    bool checkCell(CPosition position) const;
+    bool checkCell(Position position) const;
 
     // Getter
-    CCell * getCell(CPosition position) const;
+    CCell * getCell(Position position) const;
 
     void evaluate(); 
 private:
     int m_id = 0;
 
-    CParser m_parser;
-
-    std::map<CPosition, CCell*> m_table;
+    std::map<Position, CCell*> m_table;
 };
 
 #endif //PYSAROLE_CTABLE_H

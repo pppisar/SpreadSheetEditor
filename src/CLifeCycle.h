@@ -5,6 +5,7 @@
 #include <ncurses.h>
 
 #include "CConstants.h"
+#include "CTable.h"
 #include "CInterface/CInterfaceController.h"
 #include "CInterface/CInterfaceWelcome.h"
 #include "CInterface/CInterfaceHelp.h"
@@ -30,6 +31,8 @@ private:
     CInterfaceTable * m_tableInterface;
 
     std::map<int, CInterfaceController*> m_allScreens;
+
+    CTable* m_table;
 
     int m_currentScreen;
     int m_previousScreen;

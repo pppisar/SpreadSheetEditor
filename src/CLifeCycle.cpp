@@ -25,7 +25,8 @@ CLifeCycle::CLifeCycle() {
     m_welcomeInterface = new CInterfaceWelcome();
     m_helpInterface = new CInterfaceHelp();
     m_menuInterface = new CInterfaceMenu();
-    m_tableInterface = new CInterfaceTable();
+    m_table = new CTable();
+    m_tableInterface = new CInterfaceTable(m_table);
     m_allScreens.emplace(SCREEN_WELCOME, m_welcomeInterface);
     m_allScreens.emplace(SCREEN_HELP, m_helpInterface);
     m_allScreens.emplace(SCREEN_MENU, m_menuInterface);
@@ -37,10 +38,10 @@ CLifeCycle::CLifeCycle() {
 }
 
 CLifeCycle::~CLifeCycle() {
-    for (auto screen: m_allScreens) {
+    for (auto screen: m_allScreens)
         delete screen.second;
-    }
 
+    delete m_table;
     endwin();
 }
 

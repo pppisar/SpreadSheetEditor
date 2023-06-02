@@ -10,27 +10,28 @@ CTable::~CTable() {
         delete it.second;
 }
 
-void CTable::setCell(CPosition position, std::string & expression) {
-    // parsing of expression
+void CTable::setCell(Position position, 
+                     std::string & expression, 
+                     ParseResult& info) {
     std::string value = expression;
 
     if (m_table.find(position) == m_table.end()) {
-        CCell * cell = new CCell(m_id++, value, expression, false);
+        CCell * cell = new CCell(m_id++, expression, info);
 
         m_table[position] = cell;
     }
     else {
-        m_table[position]->update(expression,value, false);
+        m_table[position]->update(expression, info);
     }
 }
 
-bool CTable::checkCell(CPosition position) const {
+bool CTable::checkCell(Position position) const {
     if (m_table.find(position) == m_table.end())
         return false;
     return true;
 }
 
-CCell* CTable::getCell(CPosition position) const {
+CCell* CTable::getCell(Position position) const {
     auto it = m_table.find(position);
     if (it == m_table.end()) {
         // TODO: Error

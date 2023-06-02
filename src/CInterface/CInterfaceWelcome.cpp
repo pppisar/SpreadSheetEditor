@@ -7,7 +7,7 @@ void CInterfaceWelcome::reset() {
 void CInterfaceWelcome::action(int actKey) {
     switch (actKey) {
         case KEY_UP:
-            if (m_selected - 1 >= 0)
+            if ((int)(m_selected - 1) >= 0)
                 m_selected -= 1;
             renderBody();
             break;

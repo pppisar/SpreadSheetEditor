@@ -6,7 +6,15 @@
 #include <map>
 
 // Own types
-typedef std::pair<int, int> CPosition;
+typedef std::pair<int, int> Position;
+//                         isNum, isErr,      value
+typedef std::pair<std::pair<bool, bool>, std::string> ParseResult;
+//               isNum,      value
+typedef std::pair<bool, std::string> Value;
+//                priority, operator
+typedef std::pair<unsigned, char> Operator;
+//               isErr,      value
+typedef std::pair<bool, std::string> execRes;
 
 // Screens constants
 const unsigned SCREEN_WELCOME = 0;

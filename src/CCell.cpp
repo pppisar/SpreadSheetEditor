@@ -1,27 +1,21 @@
 #include "CCell.h"
 
 CCell::CCell(int id,
-             std::string & expression, std::string & value,
-             bool isNumeric) {
+             std::string & expression,
+             ParseResult& info) {
     m_id = id;
     m_expression = expression;
-    m_value = value;
-    m_isNumeric = isNumeric;
+    m_value = info.second;
+    m_isNumeric = info.first.first;
+    m_isError = info.first.second;
 }
 
 CCell::CCell(const CCell &src) {
     m_id = src.m_id;
     m_value = src.m_value;
     m_expression = src.m_expression;
-
-}
-
-
-double CCell::getValNumeric() const {
-    // TODO: Convert value to double if it is a number.
-    if (m_isNumeric)
-        return 1.0;
-    return 0.0; // throw error
+    m_isNumeric = src.m_isNumeric;
+    m_isError = src.m_isError;
 }
 
 std::string CCell::getValString() const {
@@ -33,8 +27,9 @@ std::string CCell::getExpression() const {
 }
 
 
-void CCell::update(std::string & newExpression, std::string & newValue, bool isNumeric) {
+void CCell::update(std::string & newExpression, ParseResult& info) {
     m_expression = newExpression;
-    m_value = newValue;
-    m_isNumeric = isNumeric;
+    m_value = info.second;
+    m_isNumeric = info.first.first;
+    m_isError = info.first.second;
 }

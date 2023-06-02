@@ -3,12 +3,12 @@
 
 #include "../CConstants.h"
 #include "../CTable.h"
+#include "../CParser.h"
 #include "CInterfaceController.h"
 
 class CInterfaceTable : public CInterfaceController {
 public:
-//    CInterfaceTable(CTable * table);
-    CInterfaceTable();
+    CInterfaceTable(CTable * table);
 
     virtual ~CInterfaceTable() = default;
 
@@ -23,6 +23,7 @@ public:
     void display() override;
 private:
     CTable * m_table;
+    CParser m_parser;
 
     int m_posX;
     int m_posY;

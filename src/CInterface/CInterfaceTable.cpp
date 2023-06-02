@@ -1,11 +1,8 @@
 #include "CInterfaceTable.h"
 
-//CInterfaceTable::CInterfaceTable(CTable *table) {
-//    m_table = table;
-//}
-
-CInterfaceTable::CInterfaceTable() {
-    m_table = new CTable();
+CInterfaceTable::CInterfaceTable(CTable *table) 
+: m_parser(table) {
+    m_table = table;
     m_startX = m_startY = m_posY = m_posX = 0;
     m_realX = m_startX + m_posX;
     m_realY = m_startY + m_posY;
@@ -205,8 +202,6 @@ void CInterfaceTable::display() {
     m_posX = m_posY = 0;
     m_realX = m_startX + m_posX;
     m_realY = m_startY + m_posY;
-    mvprintw(1,0,"RC: %d | CC: %d | TermW: %d | TermH: %d | TablH: %d",
-             m_rowCount, m_columnCount, m_terminalWidth, m_terminalHeight, m_tableHeight);
     renderHeader();
     renderBody();
     renderFooter();
@@ -288,7 +283,10 @@ void CInterfaceTable::editCell() {
     }
     curs_set(0);
 
-    m_table->setCell(std::make_pair(m_realX, m_realY), buffer);
+    ParseResult info = m_parser.process(buffer);
+
+    m_table->setCell(std::make_pair(m_realX, m_realY), 
+                     buffer, info);
     renderHeader();
     renderCell();
 }
