@@ -42,7 +42,7 @@ private:
     int m_rowCount;
     int m_columnCount;
 
-
+private:
     void changePosition(int x, int y);
 
     void renderHeader() const override;

@@ -7,27 +7,28 @@
 
 // Own types
 typedef std::pair<int, int> Position;
-//                         isNum, isErr,      value
-typedef std::pair<std::pair<bool, bool>, std::string> ParseResult;
-//               isNum,      value
-typedef std::pair<bool, std::string> Value;
-//                priority, operator
-typedef std::pair<unsigned, std::string> Operator;
-//               isErr,      value
-typedef std::pair<bool, std::string> execRes;
 
-// Screens constants
-const int SCREEN_WELCOME = 0;
-const int SCREEN_HELP = 1;
-const int SCREEN_TABLE = 2;
-const int SCREEN_MENU = 3;
+// Types of cell value
+enum DataType {
+    String,
+    Integer,
+    Double
+};
 
-// Menu constants
-const int MENU_CREATE = 0;
-const int MENU_LOAD = 1;
-const int MENU_SAVE = 2;
-const int MENU_SAVE_AS = 3;
-const int MENU_EXIT = 4;
+enum Screen {
+    Welcome,
+    Help,
+    Table,
+    Menu
+};
+
+enum MenuOption {
+    Create,
+    Load,
+    Save,
+    Save_as,
+    Exit
+};
 
 // Table constants
 const unsigned CELL_WIDTH = 10;

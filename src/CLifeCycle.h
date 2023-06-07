@@ -14,28 +14,25 @@
 
 class CLifeCycle {
 public:
-    
-
     CLifeCycle();
 
     ~CLifeCycle();
 
-    void changeScreen(const int screen);
+    void changeScreen(const Screen screen);
 
     void run();
-
 private:
     CInterfaceWelcome * m_welcomeInterface;
     CInterfaceHelp * m_helpInterface;
     CInterfaceMenu * m_menuInterface;
     CInterfaceTable * m_tableInterface;
 
-    std::map<int, CInterfaceController*> m_allScreens;
+    std::map<Screen, CInterfaceController*> m_allScreens;
 
     CTable* m_table;
 
-    int m_currentScreen;
-    int m_previousScreen;
+    Screen m_currentScreen;
+    Screen m_previousScreen;
 
     int m_terminalWidth;
     int m_terminalHeight;

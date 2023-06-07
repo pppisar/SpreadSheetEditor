@@ -15,9 +15,7 @@ public:
     virtual ~CTable();
 
     // Setter
-    void setCell(Position position, 
-                 std::string & expression,
-                 ParseResult& info);
+    void createCell(Position position);
 
     bool checkCell(Position position) const;
 
@@ -26,8 +24,6 @@ public:
 
     void evaluate(); 
 private:
-    int m_id = 0;
-
     std::map<Position, CCell*> m_table;
 };
 

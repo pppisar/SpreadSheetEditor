@@ -283,10 +283,13 @@ void CInterfaceTable::editCell() {
     }
     curs_set(0);
 
-    ParseResult info = m_parser.process(buffer);
-
-    m_table->setCell(std::make_pair(m_realX, m_realY), 
-                     buffer, info);
+    if (m_table->checkCell(std::make_pair(m_realX, m_realY)))
+        m_parser.process(buffer, *m_table->getCell(std::make_pair(m_realX, m_realY)));
+    else {
+        m_table->createCell(std::make_pair(m_realX, m_realY));
+        m_parser.process(buffer, *m_table->getCell(std::make_pair(m_realX, m_realY)));
+    }
+    
     renderHeader();
     renderCell();
 }

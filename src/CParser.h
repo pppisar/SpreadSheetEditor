@@ -5,10 +5,11 @@
 #include "CTable.h"
 #include "CCell.h"
 #include <ncurses.h> // del
+#include <sstream>
 #include <cmath>
+#include <regex>
 #include <string>
 #include <stack>
-#include <vector>
 
 class CParser {
 public:
@@ -16,28 +17,37 @@ public:
 
     ~CParser() = default;
 
-    ParseResult process(std::string expression);
+    void process(std::string expression, CCell & cell);
 private:
     CTable* m_table;
+private:
+    struct CValue {
+        CValue() = default;
 
+        CValue(std::string inValue, DataType inType)
+        : value(inValue), type(inType) { }
+
+        std::string value;
+        DataType type;
+    };
+
+    struct COperation {
+        COperation(std::string inOperation, unsigned inPriority)
+        : operation(inOperation), priority(inPriority) { }
+
+        std::string operation;
+        unsigned priority;
+    };
+private:
     void toUpperCase(std::string& text);
 
     bool isOperator(char op) const;
 
-    bool execOperator(Operator& op,
-                      Value& argument1,
-                      Value& argument2,
-                      Value& resEval);
-
     bool isFunction(const std::string& function) const;
 
-    bool execFunction(const std::string& function, 
-                      const std::string& argument,
-                      Value& resVal);
+    bool isNumeric(std::string& value) const;
 
     bool isInteger(const std::string& value) const;
-
-    bool isNumeric(const std::string& value) const;
 
     bool isValidCell(const std::string& cell) const;
 
@@ -45,7 +55,15 @@ private:
 
     unsigned getPriority(std::string op) const;
 
-    Value getValue(std::string value) const;
+    bool execOperation(COperation& op,
+                       CValue& argument1,
+                       CValue& argument2,
+                       CValue& resEval);
+
+
+    bool execFunction(COperation& op, 
+                      CValue& argument1,
+                      CValue& resEval);
 };
 
 

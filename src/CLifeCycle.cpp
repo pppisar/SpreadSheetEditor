@@ -25,13 +25,13 @@ CLifeCycle::CLifeCycle() {
     m_menuInterface = new CInterfaceMenu();
     m_table = new CTable();
     m_tableInterface = new CInterfaceTable(m_table);
-    m_allScreens.emplace(SCREEN_WELCOME, m_welcomeInterface);
-    m_allScreens.emplace(SCREEN_HELP, m_helpInterface);
-    m_allScreens.emplace(SCREEN_MENU, m_menuInterface);
-    m_allScreens.emplace(SCREEN_TABLE, m_tableInterface);
+    m_allScreens.emplace(Screen::Welcome, m_welcomeInterface);
+    m_allScreens.emplace(Screen::Help, m_helpInterface);
+    m_allScreens.emplace(Screen::Menu, m_menuInterface);
+    m_allScreens.emplace(Screen::Table, m_tableInterface);
 
     // Set welcome screen
-    m_previousScreen = m_currentScreen = SCREEN_WELCOME;
+    m_previousScreen = m_currentScreen = Screen::Welcome;
     changeScreen(m_currentScreen);
 }
 
@@ -43,7 +43,7 @@ CLifeCycle::~CLifeCycle() {
     endwin();
 }
 
-void CLifeCycle::changeScreen(const int screen) {
+void CLifeCycle::changeScreen(const Screen screen) {
     m_previousScreen = m_currentScreen;
     m_currentScreen = screen;
     m_allScreens[screen]->display();
@@ -67,53 +67,55 @@ void CLifeCycle::run() {
 
         switch(inpChar) {
             case KEY_F(1): // show help page
-                if (m_currentScreen == SCREEN_HELP)
+                if (m_currentScreen == Screen::Help)
                     changeScreen(m_previousScreen);
                 else {
-                    m_allScreens[SCREEN_HELP]->reset();
-                    changeScreen(SCREEN_HELP);
+                    m_allScreens[Screen::Help]->reset();
+                    changeScreen(Screen::Help);
                 }
                 break;
             case 27: // Esc button => menu page
-                if (m_currentScreen != SCREEN_WELCOME) {
-                    if (m_currentScreen == SCREEN_HELP)
+                if (m_currentScreen != Screen::Welcome) {
+                    if (m_currentScreen == Screen::Help)
                         changeScreen(m_previousScreen);
-                    else if (m_currentScreen == SCREEN_MENU)
-                        changeScreen(SCREEN_TABLE);
+                    else if (m_currentScreen == Screen::Menu)
+                        changeScreen(Screen::Table);
                     else {
-                        m_allScreens[SCREEN_MENU]->reset();
-                        changeScreen(SCREEN_MENU);
+                        m_allScreens[Screen::Menu]->reset();
+                        changeScreen(Screen::Menu);
                     }
                 }
                 break;
             case '\n':
             case KEY_ENTER:
-                if (m_currentScreen == SCREEN_TABLE) {
+                if (m_currentScreen == Screen::Table) {
                     m_allScreens[m_currentScreen]->action(inpChar);
                 }
                 else {
-                    if (m_currentScreen == SCREEN_WELCOME) {
+                    if (m_currentScreen == Screen::Welcome) {
                         switch (m_welcomeInterface->getSelected()) {
-                            case MENU_CREATE:
-                                changeScreen(SCREEN_TABLE);
+                            case MenuOption::Create:
+                                changeScreen(Screen::Table);
                                 break;
-                            case MENU_LOAD:
+                            case MenuOption::Load:
                                 break;
-                            case MENU_EXIT:
+                            case MenuOption::Exit:
                                 return;
+                            default:
+                                break;
                         }
                     }
-                    else if (m_currentScreen == SCREEN_MENU) {
+                    else if (m_currentScreen == Screen::Menu) {
                         switch (m_menuInterface->getSelected()) {
-                        case MENU_CREATE:
+                        case MenuOption::Create:
                             break;
-                        case MENU_LOAD:
+                        case MenuOption::Load:
                             break;
-                        case MENU_SAVE:
+                        case MenuOption::Save:
                             break;
-                        case MENU_SAVE_AS:
+                        case MenuOption::Save_as:
                             break;
-                        case MENU_EXIT:
+                        case MenuOption::Exit:
                             return;
                         default:
                             break;

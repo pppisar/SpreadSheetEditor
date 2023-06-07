@@ -4,18 +4,19 @@ CParser::CParser(CTable* table) {
     m_table = table;
 }
 
-ParseResult CParser::process(std::string expression) {
+void CParser::process(std::string expression, CCell & cell) {
     size_t expLength = expression.length();
-    std::stack<Value> values;
-    std::stack<Operator> operators;
-    std::set<Position> dependences;
+    std::stack<CValue> values;
+    std::stack<COperation> operations;
     bool prevIsOper = true;
-    bool isError = false;
+
+
+    bool error = false;
     std::string resValue;
+    DataType resDataType = DataType::String;
+    std::set<Position> dependences;
 
     if (expression.size() > 0 && expression[0] == '=') {
-        Value newVal;
-
         for (size_t expPosStart = 1; expPosStart < expLength; expPosStart++) {
             if (isspace(expression[expPosStart]))
                 continue;
@@ -28,19 +29,21 @@ ParseResult CParser::process(std::string expression) {
                     std::string value = expression.substr(expPosStart, expPosEnd - expPosStart);
                     mvprintw(25,20,"Int val: %s", value.c_str());
                     if (isNumeric(value)) {
-                        newVal = getValue(expression.substr(expPosStart, expPosEnd - expPosStart));
-                        values.push(newVal);
+                        if (isInteger(value))
+                            values.push(CValue(value, DataType::Integer));
+                        else
+                            values.push(CValue(value, DataType::Double));
                         expPosStart = expPosEnd - 1;
                         prevIsOper = false;
                     }
                     else {
-                        isError = true;
-                        resValue = "UnknowVal";
+                        error = true;
+                        resValue = "BadSyntax";
                         break;
                     }
                 }
                 else {
-                    isError = true;
+                    error = true;
                     resValue = "BadSyntax";
                     break;
                 }
@@ -51,21 +54,20 @@ ParseResult CParser::process(std::string expression) {
                     for (; expPosEnd < expLength; expPosEnd++)
                         if (expression[expPosEnd] == '"')
                             break;
-                    std::string strVal = expression.substr(expPosStart, expPosEnd - expPosStart);
+                    std::string value = expression.substr(expPosStart, expPosEnd - expPosStart);
                     if (expPosEnd != expression.size()) {
-                        newVal = getValue(strVal);
-                        values.push(newVal);
-                        expPosStart = expPosEnd + 1;
+                        values.push(CValue(value, DataType::String));
+                        expPosStart = expPosEnd;
                         prevIsOper = false;
                     }
                     else {
-                        isError = true;
+                        error = true;
                         resValue = "Expected\"";
                         break;
                     }
                 }
                 else {
-                    isError = true;
+                    error = true;
                     resValue = "BadSyntax";
                     break;
                 }
@@ -80,137 +82,160 @@ ParseResult CParser::process(std::string expression) {
                         std::string func = expression.substr(expPosStart, expPosEnd - expPosStart);
                         toUpperCase(func);
                         if (isFunction(func)) {
-                            operators.push(std::make_pair(0, func));
+                            operations.push(COperation(func, 0));
                             prevIsOper = true;
                             expPosStart = expPosEnd;
                         }
                         else {
-                            isError = true;
-                            resValue = "UnexpFunc";
+                            error = true;
+                            resValue = "BadSyntax";
                             break;
                         }
                     }
                     else {
-                        std::string cell = expression.substr(expPosStart, expPosEnd - expPosStart);
-                        mvprintw(25,40,"Cell: %s", cell.c_str());
-                        toUpperCase(cell);
-                        if (isValidCell(cell)) {
-                            dependences.insert(getCellPosition(cell));
-                            newVal = getValue(m_table->getCell(getCellPosition(cell))->getValString());
-                            values.push(newVal);
-                            expPosStart = expPosEnd;
-                            prevIsOper = false;
+                        std::string value = expression.substr(expPosStart, expPosEnd - expPosStart);
+                        mvprintw(25,40,"Cell: %s", value.c_str());
+                        toUpperCase(value);
+                        if (isValidCell(value)) {
+                            Position cellPosition = getCellPosition(value);
+                            if (m_table->checkCell(cellPosition) && !m_table->getCell(cellPosition)->getErrorStatus()) {
+                                m_table->getCell(cellPosition)->addDependence(cellPosition); // ----------------------
+                                std::string cellValue = m_table->getCell(cellPosition)->getValString();
+                                DataType cellDataType = m_table->getCell(cellPosition)->getValType();
+                                values.push(CValue(cellValue, cellDataType));
+                                expPosStart = expPosEnd;
+                                prevIsOper = false;
+                            }
+                            else {
+                                error = true;
+                                resValue = "BadLogic";
+                                break;
+                            }
                         }
                         else {
-                            isError = true;
-                            resValue = "UnknowRef";
+                            error = true;
+                            resValue = "BadSyntax";
                             break;
                         }
                     }
                 }
                 else {
-                    isError = true;
+                    error = true;
                     resValue = "BadSyntax";
                     break;
                 }
             }
             else if (expression[expPosStart] == '(') {
                 if (prevIsOper)
-                    operators.push(std::make_pair(0, "("));
+                    operations.push(COperation("(", 0));
                 else {
-                    isError = true;
+                    error = true;
                     resValue = "BadSyntax";
                     break;
                 }
             }
             else if (expression[expPosStart] == ')') {
-                if (!prevIsOper && !operators.empty()) {
-                    while (!operators.empty() && 
-                    (operators.top().second != "(" || !isFunction(operators.top().second)) && 
-                    values.size() >= 2) {
-                        Operator op = operators.top();
-                        operators.pop();
-                        Value val2 = values.top();
+                if (!prevIsOper && !operations.empty()) {
+                    while (!operations.empty() && 
+                    (operations.top().operation != "(" && !isFunction(operations.top().operation))) {
+                        COperation op = operations.top();
+                        operations.pop();
+                        CValue val2 = values.top();
                         values.pop();
-                        Value val1 = values.top();
+                        CValue val1 = values.top();
                         values.pop();
-                        Value resEval;
-                        if (!execOperator(op, val1, val2, resEval))
+                        CValue resEval;
+                        if (!execOperation(op, val1, val2, resEval))
                             values.push(resEval);
                         else {
-                            isError = true;
-                            resValue = resEval.second;
+                            error = true;
+                            resValue = resEval.value;
                             break;
                         }
                     }
-                    if (!isError && (operators.empty() || values.size() < 2)) {
-                        isError = true;
+                    if (error)
+                        break;
+                    if (operations.empty()) {
+                        error = true;
                         resValue = "BadSyntax";
                         break;
                     }
-                    if (isError)
-                        break;
-                    operators.pop();
+                    if (isFunction(operations.top().operation)) {
+                        COperation op = operations.top();
+                        CValue val1 = values.top();
+                        values.pop();
+                        CValue resEval;
+                        if (!execFunction(op, val1, resEval))
+                            values.push(resEval);
+                        else {
+                            error = true;
+                            resValue = resEval.value;
+                            break;
+                        }
+                    }
+                    operations.pop();
                 }
                 else {
-                    isError = true;
+                    error = true;
                     resValue = "BadSyntax";
                     break;
                 }
             }
             else if (isOperator(expression[expPosStart])) {
-                if (operators.empty() || (
-                    (operators.top().second == "(" || isFunction(operators.top().second)) && 
+                if (operations.empty() || (
+                    (operations.top().operation == "(" || isFunction(operations.top().operation)) && 
                     (expression[expPosStart] == '+' || expression[expPosStart] == '-'))) {
-                        values.push(getValue("0"));
-                        operators.push(std::make_pair(4, std::to_string(expression[expPosStart])));
+                        values.push(CValue("0", DataType::Integer));
+                        operations.push(COperation(std::to_string(expression[expPosStart]), 4));
                 }
                 else if (!prevIsOper) {
-                    Operator currentOp = std::make_pair(getPriority(std::to_string(expression[expPosStart])), 
-                                                        std::to_string(expression[expPosStart]));
+                    COperation currentOp(std::to_string(expression[expPosStart]),
+                                         getPriority(std::to_string(expression[expPosStart])));
                     
-                    while (!operators.empty() && operators.top().first > currentOp.first && values.size() >= 2) {
-                        Operator op = operators.top();
-                        operators.pop();
-                        Value val2 = values.top();
+                    while (!operations.empty() && operations.top().priority > currentOp.priority) {
+                        COperation op = operations.top();
+                        operations.pop();
+                        CValue val2 = values.top();
                         values.pop();
-                        Value val1 = values.top();
+                        CValue val1 = values.top();
                         values.pop();
-                        Value resEval;
-                        if (!execOperator(op, val1, val2, resEval))
+                        CValue resEval;
+                        if (!execOperation(op, val1, val2, resEval))
                             values.push(resEval);
                         else {
-                            isError = true;
-                            resValue = resEval.second;
+                            error = true;
+                            resValue = resEval.value;
                             break;
                         }
                     }
-                    // if (!isError && (operators.empty() || values.size() < 2)) {
-                    //     isError = true;
-                    //     resValue = "BadSyntax";
-                    // }
-                    if (isError)
+                    if (error)
                         break;
-                    operators.push(currentOp);
+                    operations.push(currentOp);
                 }
                 else {
-                    isError = true;
+                    error = true;
                     resValue = "BadSyntax";
                     break;
                 }
             }
             else {
-                isError = true;
+                error = true;
                 resValue = "BadSyntax";
                 break;
             }
         }
     }
     else
-        values.push(getValue(expression));
+        values.push(CValue(expression, resDataType));
+    
+    if(!error) {
+        resValue =  values.top().value;
+        resDataType = values.top().type;
+    }
 
-    mvprintw(1,0,"Exp: %s | Val: %s | isError: %d", expression.c_str(), resValue.c_str(), (int)isError);
-    return std::make_pair(std::make_pair(values.top().first, isError), values.top().second);
+    cell.update(error, expression, resValue, resDataType, dependences);
+    
+    mvprintw(1,0,"Exp: %s | Val: %s | isError: %d", expression.c_str(), resValue.c_str(), (int)error);
 }
 
 void CParser::toUpperCase(std::string& text) {
@@ -224,145 +249,32 @@ bool CParser::isOperator(char op) const {
             op == '^'||  op == '%');
 }
 
-bool CParser::execOperator(Operator& op,
-                           Value& argument1,
-                           Value& argument2,
-                           Value& resEval) {
-    bool error = false;
-    std::string res;
-    if (op.second == "+") {
-        if (argument1.first && argument2.first)
-            res = std::to_string(std::stod(argument1.second) + std::stod(argument2.second));
-        else if (!argument1.first && !argument2.first)
-            res = argument1.second + argument2.second;
-        else {
-            error = true;
-            res = "BadLogic";
-        }
-    }
-    else if (op.second == "-") {
-        if (argument1.first && argument2.first)
-            res = std::to_string(std::stod(argument1.second) - std::stod(argument2.second));
-        else {
-            error = true;
-            res = "BadLogic";
-        }
-    }
-    else if (op.second == "*") {
-        if (argument1.first && argument2.first)
-            res = std::to_string(std::stod(argument1.second) * std::stod(argument2.second));
-        else if (!argument1.first && argument2.first && isInteger(argument2.second))
-            res = std::string(argument1.second, std::stoi(argument2.second));
-        else if (argument1.first && !argument2.first && isInteger(argument1.second))
-            res = std::string(argument2.second, std::stoi(argument1.second));
-        else {
-            error = true;
-            res = "BadLogic";
-        }
-    }
-    else if (op.second == "/") {
-        if (argument1.first && argument2.first && 
-            isInteger(argument2.second) && std::stod(argument2.second) != 0)
-                res = std::to_string(std::stoi(argument1.second) - std::stoi(argument2.second));
-        else {
-            error = true;
-            res = "BadLogic";
-        }
-    }
-    else if (op.second == "^") {
-        if (argument1.first && argument2.first && 
-            isInteger(argument1.second) && std::stoi(argument1.second) == 0 && 
-            std::stod(argument2.second) < 0) {
-                error = true;
-                res = "BadLogic";
-        }
-        else if (argument1.first && argument2.first)
-            res = std::to_string(pow(std::stod(argument1.second), std::stod(argument2.second)));
-        else {
-            error = true;
-            res = "BadLogic";
-        }
-    }
-    else if (op.second == "%") {
-        if (argument1.first && argument2.first && 
-            isInteger(argument1.second) && isInteger(argument2.second) && 
-            std::stoi(argument2.second) != 0)
-                res = std::to_string(std::stoi(argument1.second) % std::stoi(argument2.second));
-        else {
-            error = true;
-            res = "BadLogic";
-        }
-    }
-    return error;
+bool CParser::isFunction(const std::string& funcName) const {
+    return (funcName == "ABS" ||
+            funcName == "SIN" || funcName == "COS" ||
+            funcName == "LN" || funcName == "EXP");
 }
 
-bool CParser::isFunction(const std::string& function) const {
-    return (function == "ABS" ||
-            function == "SIN" || function == "COS" ||
-            function == "LN" || function == "EXP");
-}
-
-bool CParser::execFunction(const std::string& function, 
-                           const std::string& argument,
-                           Value& resEval) {
-    bool error = false;
-    std::string res;
-    if (function == "ABS")
-        res = std::to_string(abs(std::stod(argument)));
-    else if (function == "SIN")
-        res = std::to_string(sin(std::stod(argument)));
-    else if (function == "COS")
-        res = std::to_string(cos(std::stod(argument)));
-    else if (function == "LN") {
-        if (std::stod(argument) > 0)
-            res = std::to_string(log(std::stod(argument)));
-        else {
-            res = "BadFunArg";
-            error = true;
-        }
-    }
-    else if (function == "EXP")
-        res = std::to_string(exp(std::stod(argument)));
-
-    resEval.first = isNumeric(res);
-    resEval.second = res;
-    return error;
+bool CParser::isNumeric(std::string & value) const {
+    std::istringstream iss(value);
+    double numVal;
+    iss >> std::noskipws >> numVal;
+    return iss.eof() && !iss.fail();
 }
 
 bool CParser::isInteger(const std::string& value) const {
-    bool res = true;
-    if (value.size() == 0)
-        res = false;
-    for (char num: value) {
-        res = isdigit(num);
-        if (!res)
-            break;
-    }
-    return res;
-}
-
-bool CParser::isNumeric(const std::string& value) const {
-    try {
-        std::stod(value);
-        return true;
-    } catch (...) {
+    if (value.length() == 0)
         return false;
-    }
+    std::string transformedValue = std::to_string(std::stod(value));
+    for (char num: transformedValue)
+        if (!isdigit(num))
+            return false;
+    return true;
 }
 
 bool CParser::isValidCell(const std::string& cell) const {
-    if (cell.empty() || !isalpha(cell[0]))
-        return false;
-
-    bool hasDigit = false;
-    for (char c : cell) {
-        if (!isalnum(c) || (hasDigit && isalpha(c)))
-            return false;
-        if (isdigit(c) && !hasDigit)
-            hasDigit = true;
-    }
-
-    return hasDigit && m_table->checkCell(getCellPosition(cell));
+    std::regex pattern("[A-Z]+[0-9]+");
+    return std::regex_match(cell, pattern);
 }
 
 Position CParser::getCellPosition(std::string link) const {
@@ -384,12 +296,163 @@ unsigned CParser::getPriority(std::string op) const {
         return 2;
     else if (op == "^" || op == "%")
         return 3;
-    else // (op == "SIN" || op == "COS"
-         //  || op == "ABS"
-         //  || op == "LN" || op == "EXP")
+    else
         return 0;
 }
 
-Value CParser::getValue(std::string value) const {
-    return std::make_pair(isNumeric(value), value);
+bool CParser::execOperation(COperation& op,
+                            CValue& argument1,
+                            CValue& argument2,
+                            CValue& resEval) {
+    bool error = false;
+    DataType resType = DataType::String;
+    std::string resValue;
+    if (op.operation == "+") {
+        if (argument1.type != DataType::String && argument2.type != DataType::String) {
+            resValue = std::to_string(std::stod(argument1.value) + std::stod(argument2.value));
+            if (isInteger(resValue))
+                resType = DataType::Integer;
+            else
+                resType = DataType::Double;
+        }
+        else if (argument1.type == argument2.type && argument1.type == DataType::String)
+            resValue = argument1.value + argument2.value;
+        else {
+            error = true;
+            resValue = "BadOpArgs";
+        }
+    }
+    else if (op.operation == "-") {
+        if (argument1.type != DataType::String && argument2.type != DataType::String) {
+            resValue = std::to_string(std::stod(argument1.value) - std::stod(argument2.value));
+            if (isInteger(resValue))
+                resType = DataType::Integer;
+            else
+                resType = DataType::Double;
+        }
+        else {
+            error = true;
+            resValue = "BadLogic";
+        }
+    }
+    else if (op.operation == "*") {
+        if (argument1.type != DataType::String && argument2.type != DataType::String) {
+            resValue = std::to_string(std::stod(argument1.value) * std::stod(argument2.value));
+            if (isInteger(resValue))
+                resType = DataType::Integer;
+            else
+                resType = DataType::Double;
+        }
+        else if (argument1.type == DataType::String && argument2.type == DataType::Integer)
+            resValue = std::string(argument1.value, std::stoi(argument2.value));
+        else if (argument1.type == DataType::Integer && argument2.type == DataType::String)
+            resValue = std::string(argument2.value, std::stoi(argument1.value));
+        else {
+            error = true;
+            resValue = "BadLogic";
+        }
+    }
+    else if (op.operation == "/") {
+        if (argument1.type != DataType::String && argument2.type != DataType::String) {
+            if (argument2.type == DataType::Integer && stoi(argument2.value) == 0) {
+                error = true;
+                resValue = "BadLogic";
+            }
+            else {
+                resValue = std::to_string(std::stoi(argument1.value) / std::stoi(argument2.value));
+                if (isInteger(resValue))
+                    resType = DataType::Integer;
+                else
+                    resType = DataType::Double;
+            }
+        }
+        else {
+            error = true;
+            resValue = "BadLogic";
+        }
+    }
+    else if (op.operation == "^") {
+        if (argument1.type == DataType::Integer && stoi(argument1.value) == 0 && 
+            argument2.type != DataType::String && stod(argument2.value) <= 0) {
+                error = true;
+                resValue = "BadLogic";
+        }
+        else if (argument1.type != DataType::String && argument2.type != DataType::String) {
+            resValue = std::to_string(pow(std::stod(argument1.value), std::stod(argument2.value)));
+            if (isInteger(resValue))
+                resType = DataType::Integer;
+            else
+                resType = DataType::Double;
+        }
+        else {
+            error = true;
+            resValue = "BadLogic";
+        }
+    }
+    else if (op.operation == "%") {
+        if (argument1.type == argument2.type && argument1.type == DataType::Integer) {
+            resValue = std::to_string(std::stoi(argument1.value) % std::stoi(argument2.value));
+            resType = DataType::Integer;
+        }
+        else {
+            error = true;
+            resValue = "BadLogic";
+        }
+    }
+    resEval.value = resValue;
+    resEval.type = resType;
+    return error;
+}
+
+bool CParser::execFunction(COperation& op, 
+                           CValue& argument,
+                           CValue& resEval) {
+    bool error = false;
+    std::string resValue;
+    DataType resType = argument.type;
+    if (argument.type != DataType::String) {
+        if (op.operation == "ABS")
+            resValue = std::to_string(abs(std::stod(argument.value)));
+        else if (op.operation == "SIN") {
+            resValue = std::to_string(sin(std::stod(argument.value)));
+            if (isInteger(resValue))
+                resType = DataType::Integer;
+            else
+                resType = DataType::Double;
+        }
+        else if (op.operation == "COS") {
+            resValue = std::to_string(cos(std::stod(argument.value)));
+            if (isInteger(resValue))
+                resType = DataType::Integer;
+            else
+                resType = DataType::Double;
+        }
+        else if (op.operation == "LN") {
+            if (std::stod(argument.value) > 0) {
+                resValue = std::to_string(log(std::stod(argument.value)));
+                if (isInteger(resValue))
+                    resType = DataType::Integer;
+                else
+                    resType = DataType::Double;
+            }
+            else {
+                resValue = "BadOpArgs";
+                error = true;
+            }
+        }
+        else if (op.operation == "EXP") {
+            resValue = std::to_string(exp(std::stod(argument.value)));
+            if (isInteger(resValue))
+                resType = DataType::Integer;
+            else
+                resType = DataType::Double;
+        }
+    }
+    else {
+        error = true;
+        resValue = "BadOpArgs";
+    }
+    resEval.value = resValue;
+    resEval.type = resType;
+    return error;
 }

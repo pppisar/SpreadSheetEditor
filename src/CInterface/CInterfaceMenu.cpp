@@ -52,19 +52,19 @@ void CInterfaceMenu::display() {
     renderFooter();
 }
 
-unsigned CInterfaceMenu::getSelected() const {
+MenuOption CInterfaceMenu::getSelected() const {
     switch (m_selected) {
         case 0:
-            return MENU_CREATE;
+            return MenuOption::Create;
         case 1:
-            return MENU_LOAD;
+            return MenuOption::Load;
         case 2:
-            return MENU_SAVE;
+            return MenuOption::Save;
         case 3:
-            return MENU_SAVE_AS;
+            return MenuOption::Save_as;
         case 4:
-            return MENU_EXIT;
+            return MenuOption::Exit;
         default:
-            return MENU_EXIT;
+            return MenuOption::Exit;
     }
 }

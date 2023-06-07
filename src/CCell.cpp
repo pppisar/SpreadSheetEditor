@@ -1,35 +1,36 @@
 #include "CCell.h"
 
-CCell::CCell(int id,
-             std::string & expression,
-             ParseResult& info) {
-    m_id = id;
+CCell::CCell(Position position) 
+: m_position(position) { }
+
+void CCell::update(bool error,
+                   std::string & expression,
+                   std::string & value,
+                   DataType valueType,
+                   std::set<Position> usesCells) {
+    m_error = error;
     m_expression = expression;
-    m_value = info.second;
-    m_isNumeric = info.first.first;
-    m_isError = info.first.second;
+    m_value = value;
+    m_type = valueType;
+    m_usesCells = usesCells;
 }
 
-CCell::CCell(const CCell &src) {
-    m_id = src.m_id;
-    m_value = src.m_value;
-    m_expression = src.m_expression;
-    m_isNumeric = src.m_isNumeric;
-    m_isError = src.m_isError;
+void CCell::addDependence(Position cell) {
+    m_usedByCells.insert(cell);
+}
+
+bool CCell::getErrorStatus() const {
+    return m_error;
 }
 
 std::string CCell::getValString() const {
     return m_value;
 }
 
-std::string CCell::getExpression() const {
-    return m_expression;
+DataType CCell::getValType() const {
+    return m_type;
 }
 
-
-void CCell::update(std::string & newExpression, ParseResult& info) {
-    m_expression = newExpression;
-    m_value = info.second;
-    m_isNumeric = info.first.first;
-    m_isError = info.first.second;
+std::string CCell::getExpression() const {
+    return m_expression;
 }

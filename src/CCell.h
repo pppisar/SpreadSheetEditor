@@ -7,29 +7,41 @@
 
 class CCell {
 public:
-    CCell(int id,
-          std::string & expression, 
-          ParseResult& info);
+    CCell(Position position);
 
-    CCell(const CCell & src);
+    ~CCell() = default;
 
-    virtual ~CCell() = default;
+    // Setter
+    void update(bool error,
+                std::string & expression,
+                std::string & value,
+                DataType valueType,
+                std::set<Position> usesCells);
+
+    void addDependence(Position cell);
 
     // Getters
 
-    virtual std::string getValString() const;
+    Position getPosition() const;
 
-    virtual std::string getExpression() const;
+    bool getErrorStatus() const;
 
-    // Setter
-    virtual void update(std::string & newExpression, ParseResult& info);
+    std::string getValString() const;
 
+    DataType getValType() const;
+
+    std::string getExpression() const;
 private:
-    int m_id;
-    std::string m_value;
+    Position m_position;
+    bool m_error;
     std::string m_expression;
-    bool m_isNumeric;
-    bool m_isError;
-    std::set<Position> m_dependences;
+    std::string m_value;
+    DataType m_type;
+
+    // Which cells this cell refers to
+    std::set<Position> m_usesCells;
+
+    // Who refers to this cell.
+    std::set<Position> m_usedByCells;
 };
 #endif //PYSAROLE_CCELL_H

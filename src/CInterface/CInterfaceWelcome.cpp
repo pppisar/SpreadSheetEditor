@@ -53,15 +53,15 @@ void CInterfaceWelcome::display() {
     renderFooter();
 }
 
-unsigned CInterfaceWelcome::getSelected() const {
+MenuOption CInterfaceWelcome::getSelected() const {
     switch (m_selected) {
         case 0:
-            return MENU_CREATE;
+            return MenuOption::Create;
         case 1:
-            return MENU_LOAD;
+            return MenuOption::Load;
         case 2:
-            return MENU_EXIT;
+            return MenuOption::Exit;
         default:
-            return MENU_CREATE;
+            return MenuOption::Create;
     }
 }

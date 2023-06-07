@@ -19,7 +19,7 @@ public:
     void display() override;
 
     // Get selected item
-    unsigned getSelected() const;
+    MenuOption getSelected() const;
 private:
     void renderHeader() const override;
     void renderBody() const override;
