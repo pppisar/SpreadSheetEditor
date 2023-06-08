@@ -38,13 +38,13 @@ void CParser::process(std::string expression, CCell & cell) {
                     }
                     else {
                         error = true;
-                        resValue = "BadSyntax";
+                        resValue = "BadSynt01";
                         break;
                     }
                 }
                 else {
                     error = true;
-                    resValue = "BadSyntax";
+                    resValue = "BadSynt02";
                     break;
                 }
             }
@@ -68,7 +68,7 @@ void CParser::process(std::string expression, CCell & cell) {
                 }
                 else {
                     error = true;
-                    resValue = "BadSyntax";
+                    resValue = "BadSynt03";
                     break;
                 }
             }
@@ -88,7 +88,7 @@ void CParser::process(std::string expression, CCell & cell) {
                         }
                         else {
                             error = true;
-                            resValue = "BadSyntax";
+                            resValue = "BadSynt04";
                             break;
                         }
                     }
@@ -114,14 +114,14 @@ void CParser::process(std::string expression, CCell & cell) {
                         }
                         else {
                             error = true;
-                            resValue = "BadSyntax";
+                            resValue = "BadSynt05";
                             break;
                         }
                     }
                 }
                 else {
                     error = true;
-                    resValue = "BadSyntax";
+                    resValue = "BadSynt06";
                     break;
                 }
             }
@@ -130,7 +130,7 @@ void CParser::process(std::string expression, CCell & cell) {
                     operations.push(COperation("(", 0));
                 else {
                     error = true;
-                    resValue = "BadSyntax";
+                    resValue = "BadSynt07";
                     break;
                 }
             }
@@ -157,7 +157,7 @@ void CParser::process(std::string expression, CCell & cell) {
                         break;
                     if (operations.empty()) {
                         error = true;
-                        resValue = "BadSyntax";
+                        resValue = "BadSynt08";
                         break;
                     }
                     if (isFunction(operations.top().operation)) {
@@ -177,22 +177,23 @@ void CParser::process(std::string expression, CCell & cell) {
                 }
                 else {
                     error = true;
-                    resValue = "BadSyntax";
+                    resValue = "BadSynt09";
                     break;
                 }
             }
             else if (isOperator(expression[expPosStart])) {
-                if (operations.empty() || (
-                    (operations.top().operation == "(" || isFunction(operations.top().operation)) && 
-                    (expression[expPosStart] == '+' || expression[expPosStart] == '-'))) {
-                        values.push(CValue("0", DataType::Integer));
-                        operations.push(COperation(std::to_string(expression[expPosStart]), 4));
+                if (((values.empty() && operations.empty()) || 
+                (prevIsOper && !operations.empty() && 
+                (operations.top().operation == "(" || isFunction(operations.top().operation)))) &&
+                (expression[expPosStart] == '+' || expression[expPosStart] == '-')) {
+                    values.push(CValue("0", DataType::Integer));
+                    operations.push(COperation(std::string(1, expression[expPosStart]), 4));
                 }
                 else if (!prevIsOper) {
-                    COperation currentOp(std::to_string(expression[expPosStart]),
-                                         getPriority(std::to_string(expression[expPosStart])));
+                    COperation currentOp(std::string(1, expression[expPosStart]),
+                                         getPriority(std::string(1, expression[expPosStart])));
                     
-                    while (!operations.empty() && operations.top().priority > currentOp.priority) {
+                    while (!operations.empty() && operations.top().priority >= currentOp.priority) {
                         COperation op = operations.top();
                         operations.pop();
                         CValue val2 = values.top();
@@ -211,16 +212,17 @@ void CParser::process(std::string expression, CCell & cell) {
                     if (error)
                         break;
                     operations.push(currentOp);
+                    prevIsOper = true;
                 }
                 else {
                     error = true;
-                    resValue = "BadSyntax";
+                    resValue = "BadSynt10";
                     break;
                 }
             }
             else {
                 error = true;
-                resValue = "BadSyntax";
+                resValue = "BadSynt11";
                 break;
             }
         }
@@ -265,10 +267,8 @@ bool CParser::isNumeric(std::string & value) const {
 bool CParser::isInteger(const std::string& value) const {
     if (value.length() == 0)
         return false;
-    std::string transformedValue = std::to_string(std::stod(value));
-    for (char num: transformedValue)
-        if (!isdigit(num))
-            return false;
+    if (std::stod(value) - std::stoi(value) > 1e-6)
+        return false;
     return true;
 }
 
@@ -300,18 +300,28 @@ unsigned CParser::getPriority(std::string op) const {
         return 0;
 }
 
+std::string CParser::repeatString(std::string text, int n) const {
+    std::string resText;
+    for (int i = 0; i < n; i++)
+        resText += text;
+    return resText;
+}
+
 bool CParser::execOperation(COperation& op,
                             CValue& argument1,
                             CValue& argument2,
                             CValue& resEval) {
     bool error = false;
     DataType resType = DataType::String;
+    mvprintw(25,20,"Int val: %s %s %s", argument1.value.c_str(), op.operation.c_str(), argument2.value.c_str());
     std::string resValue;
     if (op.operation == "+") {
         if (argument1.type != DataType::String && argument2.type != DataType::String) {
             resValue = std::to_string(std::stod(argument1.value) + std::stod(argument2.value));
-            if (isInteger(resValue))
+            if (isInteger(resValue)) {
                 resType = DataType::Integer;
+                resValue = std::to_string(std::stoi(resValue));
+            }
             else
                 resType = DataType::Double;
         }
@@ -325,8 +335,10 @@ bool CParser::execOperation(COperation& op,
     else if (op.operation == "-") {
         if (argument1.type != DataType::String && argument2.type != DataType::String) {
             resValue = std::to_string(std::stod(argument1.value) - std::stod(argument2.value));
-            if (isInteger(resValue))
+            if (isInteger(resValue)) {
                 resType = DataType::Integer;
+                resValue = std::to_string(std::stoi(resValue));
+            }
             else
                 resType = DataType::Double;
         }
@@ -338,15 +350,17 @@ bool CParser::execOperation(COperation& op,
     else if (op.operation == "*") {
         if (argument1.type != DataType::String && argument2.type != DataType::String) {
             resValue = std::to_string(std::stod(argument1.value) * std::stod(argument2.value));
-            if (isInteger(resValue))
+            if (isInteger(resValue)) {
                 resType = DataType::Integer;
+                resValue = std::to_string(std::stoi(resValue));
+            }
             else
                 resType = DataType::Double;
         }
         else if (argument1.type == DataType::String && argument2.type == DataType::Integer)
-            resValue = std::string(argument1.value, std::stoi(argument2.value));
+            resValue = repeatString(argument1.value, std::stoi(argument2.value));
         else if (argument1.type == DataType::Integer && argument2.type == DataType::String)
-            resValue = std::string(argument2.value, std::stoi(argument1.value));
+            resValue = repeatString(argument2.value, std::stoi(argument1.value));
         else {
             error = true;
             resValue = "BadLogic";
@@ -360,8 +374,10 @@ bool CParser::execOperation(COperation& op,
             }
             else {
                 resValue = std::to_string(std::stoi(argument1.value) / std::stoi(argument2.value));
-                if (isInteger(resValue))
+                if (isInteger(resValue)) {
                     resType = DataType::Integer;
+                    resValue = std::to_string(std::stoi(resValue));
+                }
                 else
                     resType = DataType::Double;
             }
@@ -379,8 +395,10 @@ bool CParser::execOperation(COperation& op,
         }
         else if (argument1.type != DataType::String && argument2.type != DataType::String) {
             resValue = std::to_string(pow(std::stod(argument1.value), std::stod(argument2.value)));
-            if (isInteger(resValue))
+            if (isInteger(resValue)) {
                 resType = DataType::Integer;
+                resValue = std::to_string(std::stoi(resValue));
+            }
             else
                 resType = DataType::Double;
         }
@@ -415,23 +433,29 @@ bool CParser::execFunction(COperation& op,
             resValue = std::to_string(abs(std::stod(argument.value)));
         else if (op.operation == "SIN") {
             resValue = std::to_string(sin(std::stod(argument.value)));
-            if (isInteger(resValue))
+            if (isInteger(resValue)) {
                 resType = DataType::Integer;
+                resValue = std::to_string(std::stoi(resValue));
+            }
             else
                 resType = DataType::Double;
         }
         else if (op.operation == "COS") {
             resValue = std::to_string(cos(std::stod(argument.value)));
-            if (isInteger(resValue))
+            if (isInteger(resValue)) {
                 resType = DataType::Integer;
+                resValue = std::to_string(std::stoi(resValue));
+            }
             else
                 resType = DataType::Double;
         }
         else if (op.operation == "LN") {
             if (std::stod(argument.value) > 0) {
                 resValue = std::to_string(log(std::stod(argument.value)));
-                if (isInteger(resValue))
-                    resType = DataType::Integer;
+                if (isInteger(resValue)) {
+                resType = DataType::Integer;
+                resValue = std::to_string(std::stoi(resValue));
+            }
                 else
                     resType = DataType::Double;
             }
@@ -442,8 +466,10 @@ bool CParser::execFunction(COperation& op,
         }
         else if (op.operation == "EXP") {
             resValue = std::to_string(exp(std::stod(argument.value)));
-            if (isInteger(resValue))
+            if (isInteger(resValue)) {
                 resType = DataType::Integer;
+                resValue = std::to_string(std::stoi(resValue));
+            }
             else
                 resType = DataType::Double;
         }

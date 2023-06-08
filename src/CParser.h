@@ -55,6 +55,8 @@ private:
 
     unsigned getPriority(std::string op) const;
 
+    std::string repeatString(std::string text, int n) const;
+
     bool execOperation(COperation& op,
                        CValue& argument1,
                        CValue& argument2,
