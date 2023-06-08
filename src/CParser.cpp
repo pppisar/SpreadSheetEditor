@@ -10,10 +10,10 @@ void CParser::process(std::string expression, CCell & cell) {
     std::stack<COperation> operations;
     bool prevIsOper = true;
 
-
     bool error = false;
     std::string resValue;
     DataType resDataType = DataType::String;
+    
     std::set<Position> dependences;
 
     if (expression.size() > 0 && expression[0] == '=') {
@@ -99,7 +99,7 @@ void CParser::process(std::string expression, CCell & cell) {
                         if (isValidCell(value)) {
                             Position cellPosition = getCellPosition(value);
                             if (m_table->checkCell(cellPosition) && !m_table->getCell(cellPosition)->getErrorStatus()) {
-                                m_table->getCell(cellPosition)->addDependence(cellPosition); // ----------------------
+                                dependences.insert(cellPosition);
                                 std::string cellValue = m_table->getCell(cellPosition)->getValString();
                                 DataType cellDataType = m_table->getCell(cellPosition)->getValType();
                                 values.push(CValue(cellValue, cellDataType));
@@ -227,12 +227,40 @@ void CParser::process(std::string expression, CCell & cell) {
             }
         }
     }
-    else
+    else {
+        if (isNumeric(expression)) {
+            if (isInteger(expression))
+                resDataType = DataType::Integer;
+            else
+                resDataType = DataType::Double;
+        }
         values.push(CValue(expression, resDataType));
-    
+    }
     if(!error) {
-        resValue =  values.top().value;
-        resDataType = values.top().type;
+        while(!operations.empty() && operations.top().operation != "(" && !isFunction(operations.top().operation)) {
+            COperation op = operations.top();
+            operations.pop();
+            CValue val2 = values.top();
+            values.pop();
+            CValue val1 = values.top();
+            values.pop();
+            CValue resEval;
+            if (!execOperation(op, val1, val2, resEval))
+                values.push(resEval);
+            else {
+                error = true;
+                resValue = resEval.value;
+                break;
+            }
+        }
+        if (operations.empty() && !error) {
+            resValue =  values.top().value;
+            resDataType = values.top().type;
+        }
+        else if (!operations.empty() && !error) {
+            error = true;
+            resValue = "BadSynt12";
+        }
     }
 
     cell.update(error, expression, resValue, resDataType, dependences);
