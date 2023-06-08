@@ -1,9 +1,9 @@
 #ifndef PYSAROLE_CPARSER_H
 #define PYSAROLE_CPARSER_H
 
-#include "CConstants.h"
-#include "CTable.h"
-#include "CCell.h"
+#include "../CConstants.h"
+#include "../CTable.h"
+#include "../CCell.h"
 #include <ncurses.h> // del
 #include <sstream>
 #include <cmath>
@@ -13,14 +13,15 @@
 
 class CParser {
 public:
-    CParser(CTable* table);
+    CParser(CTable* table, std::string expression);
 
-    ~CParser() = default;
+    virtual ~CParser() = default;
 
-    void process(std::string expression, CCell & cell);
-private:
+    virtual void process() = 0;
+protected:
     CTable* m_table;
-private:
+    std::string m_expression;
+protected:
     struct CValue {
         CValue() = default;
 
@@ -38,7 +39,7 @@ private:
         std::string operation;
         unsigned priority;
     };
-private:
+protected:
     void toUpperCase(std::string& text);
 
     bool isOperator(char op) const;

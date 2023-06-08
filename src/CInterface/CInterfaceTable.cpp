@@ -1,7 +1,6 @@
 #include "CInterfaceTable.h"
 
-CInterfaceTable::CInterfaceTable(CTable *table) 
-: m_parser(table) {
+CInterfaceTable::CInterfaceTable(CTable *table) {
     m_table = table;
     m_startX = m_startY = m_posY = m_posX = 0;
     m_realX = m_startX + m_posX;
@@ -133,39 +132,32 @@ void CInterfaceTable::renderRCTitle() const {
     }
 }
 
-void CInterfaceTable::renderCell() const {
-    if (m_table->checkCell(std::make_pair(m_realX, m_realY))) {
-        std::string value = m_table->getCell(std::make_pair(m_realX, m_realY))->getValString();
-        if (value.size() > 9)
-            mvprintw(TABLE_START_POSITION_Y + 1 + m_posY * CELL_HEIGHT,
-                     TABLE_START_POSITION_X + 1 + m_posX * CELL_WIDTH,
-                     "%.6s...", value.c_str());
-        else
-            mvprintw(TABLE_START_POSITION_Y + 1 + m_posY * CELL_HEIGHT,
-                     TABLE_START_POSITION_X + 1 + m_posX * CELL_WIDTH,
-                     "%s", value.c_str());
-    }
-}
-
 void CInterfaceTable::renderCells() const {
     for (int column = 0; column < m_columnCount; column++) {
         for (int row = 0; row < m_rowCount; row++) {
-            std::string value = std::string(9, ' ');
             if (m_table->checkCell(std::make_pair(column + m_startX, row + m_startY))) {
-                value = m_table->getCell(std::make_pair(column + m_startX, row + m_startY))->getValString();
-                if (value.size() > 9)
+                std::string value = m_table->getCell(std::make_pair(column + m_startX, row + m_startY))->getValString();
+                if (value.size() > 9) {
+                    mvprintw(TABLE_START_POSITION_Y + 1 + row * CELL_HEIGHT,
+                             TABLE_START_POSITION_X + 1 + column * CELL_WIDTH,
+                             "%s", std::string(9, ' '));
                     mvprintw(TABLE_START_POSITION_Y + 1 + row * CELL_HEIGHT,
                              TABLE_START_POSITION_X + 1 + column * CELL_WIDTH,
                              "%.6s...", value.c_str());
-                else
+                }
+                else {
                     mvprintw(TABLE_START_POSITION_Y + 1 + row * CELL_HEIGHT,
                              TABLE_START_POSITION_X + 1 + column * CELL_WIDTH,
-                             "%s", value.c_str());
+                             "%s", std::string(9, ' '));
+                    mvprintw(TABLE_START_POSITION_Y + 1 + row * CELL_HEIGHT,
+                             TABLE_START_POSITION_X + 1 + column * CELL_WIDTH,
+                             "%.9s", value.c_str());
+                }
             }
             else
                 mvprintw(TABLE_START_POSITION_Y + 1 + row * CELL_HEIGHT,
                          TABLE_START_POSITION_X + 1 + column * CELL_WIDTH,
-                         "%s", value.c_str());
+                         "%s", std::string(9, ' '));
         }
     }
 }
@@ -283,15 +275,13 @@ void CInterfaceTable::editCell() {
     }
     curs_set(0);
 
-    if (m_table->checkCell(std::make_pair(m_realX, m_realY)))
-        m_parser.process(buffer, *m_table->getCell(std::make_pair(m_realX, m_realY)));
-    else {
+    if (!m_table->checkCell(std::make_pair(m_realX, m_realY)))
         m_table->createCell(std::make_pair(m_realX, m_realY));
-        m_parser.process(buffer, *m_table->getCell(std::make_pair(m_realX, m_realY)));
-    }
+
+    
     
     renderHeader();
-    renderCell();
+    renderCells();
 }
 
 std::string CInterfaceTable::numToAlpha(int num) const {
