@@ -11,8 +11,10 @@ CTable::~CTable() {
 }
 
 void CTable::createCell(Position position) {
-    CCell * cell = new CCell(position, this);
-    m_table[position] = cell;
+    if (!checkCell(position)) {
+        CCell * cell = new CCell(position, this);
+        m_table[position] = cell;
+    }
 }
 
 bool CTable::checkCell(Position position) const {

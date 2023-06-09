@@ -4,7 +4,6 @@
 #include "CParser.h"
 #include "../CCell.h"
 #include "../CTable.h"
-#include <ncurses.h> // del
 
 class CParserExpression : public CParser {
 public:

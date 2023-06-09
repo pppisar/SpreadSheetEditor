@@ -38,17 +38,10 @@ void CInterfaceTable::renderHeader() const {
     std::string expression = " ";
     std::string value = " ";
 
-    move(1, 0);
-    clrtoeol();
-
     if (m_table->checkCell(std::make_pair(m_realX, m_realY))) {
         CCell* chosenCell = m_table->getCell(std::make_pair(m_realX, m_realY));
         expression = chosenCell->getExpression();
         value = chosenCell->getValString();
-        if (chosenCell->getErrorStatus())
-            mvprintw(1, 0, "Error: True  ");
-        else
-            mvprintw(1, 0, "Error: False ");
     }
 
     // Clear lines and render new one
@@ -281,8 +274,8 @@ void CInterfaceTable::editCell() {
         }
     }
     curs_set(0);
-    if (!m_table->checkCell(std::make_pair(m_realX, m_realY)))
-        m_table->createCell(std::make_pair(m_realX, m_realY));
+
+    m_table->createCell(std::make_pair(m_realX, m_realY));
     m_table->getCell(std::make_pair(m_realX, m_realY))->update(buffer);
 
     renderHeader();

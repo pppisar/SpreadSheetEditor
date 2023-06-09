@@ -17,7 +17,7 @@ bool CParser::isOperator(char op) const {
 }
 
 bool CParser::isFunction(const std::string& funcName) const {
-    return (funcName == "ABS" ||
+    return (funcName == "ABS" || funcName == "SQRT" ||
             funcName == "SIN" || funcName == "COS" ||
             funcName == "LN" || funcName == "EXP");
 }
@@ -32,7 +32,7 @@ bool CParser::isNumeric(std::string & value) const {
 bool CParser::isInteger(const std::string& value) const {
     if (value.length() == 0)
         return false;
-    if (std::stod(value) - std::stoi(value) > 1e-6)
+    if (std::abs(std::stod(value) - std::stoi(value)) > 1e-9)
         return false;
     return true;
 }
@@ -78,7 +78,6 @@ bool CParser::execOperation(COperation& op,
                             CValue& resEval) {
     bool error = false;
     DataType resType = DataType::String;
-    // mvprintw(25,20,"Int val: %s %s %s", argument1.value.c_str(), op.operation.c_str(), argument2.value.c_str());
     std::string resValue;
     if (op.operation == "+") {
         if (argument1.type != DataType::String && argument2.type != DataType::String) {
@@ -195,9 +194,24 @@ bool CParser::execFunction(COperation& op,
     DataType resType = argument.type;
     if (argument.type != DataType::String) {
         if (op.operation == "ABS")
-            resValue = std::to_string(abs(std::stod(argument.value)));
+            resValue = std::to_string(std::abs(std::stod(argument.value)));
+        else if (op.operation == "SQRT") {
+            if (std::stod(argument.value) >= 0) {
+                resValue = std::to_string(std::sqrt(std::stod(argument.value)));
+                if (isInteger(resValue)) {
+                    resType = DataType::Integer;
+                    resValue = std::to_string(std::stoi(resValue));
+                }
+                else
+                    resType = DataType::Double;
+            }
+            else {
+                resValue = "BadOpArgs";
+                error = true;
+            }
+        }
         else if (op.operation == "SIN") {
-            resValue = std::to_string(sin(std::stod(argument.value)));
+            resValue = std::to_string(std::sin(std::stod(argument.value)));
             if (isInteger(resValue)) {
                 resType = DataType::Integer;
                 resValue = std::to_string(std::stoi(resValue));
@@ -206,7 +220,7 @@ bool CParser::execFunction(COperation& op,
                 resType = DataType::Double;
         }
         else if (op.operation == "COS") {
-            resValue = std::to_string(cos(std::stod(argument.value)));
+            resValue = std::to_string(std::cos(std::stod(argument.value)));
             if (isInteger(resValue)) {
                 resType = DataType::Integer;
                 resValue = std::to_string(std::stoi(resValue));
@@ -216,11 +230,11 @@ bool CParser::execFunction(COperation& op,
         }
         else if (op.operation == "LN") {
             if (std::stod(argument.value) > 0) {
-                resValue = std::to_string(log(std::stod(argument.value)));
-                if (isInteger(resValue)) {
-                resType = DataType::Integer;
-                resValue = std::to_string(std::stoi(resValue));
-            }
+                resValue = std::to_string(std::log(std::stod(argument.value)));
+                    if (isInteger(resValue)) {
+                    resType = DataType::Integer;
+                    resValue = std::to_string(std::stoi(resValue));
+                }
                 else
                     resType = DataType::Double;
             }
@@ -230,7 +244,7 @@ bool CParser::execFunction(COperation& op,
             }
         }
         else if (op.operation == "EXP") {
-            resValue = std::to_string(exp(std::stod(argument.value)));
+            resValue = std::to_string(std::exp(std::stod(argument.value)));
             if (isInteger(resValue)) {
                 resType = DataType::Integer;
                 resValue = std::to_string(std::stoi(resValue));

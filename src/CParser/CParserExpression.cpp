@@ -5,16 +5,16 @@ CParserExpression::CParserExpression(CTable* table, std::string& expression)
 
 void CParserExpression::process() {
     m_error = false;
-    // m_resValue.clear();
+    m_resValue.clear();
     m_resDataType = DataType::String;
-    // m_dependences.clear();
+    m_dependences.clear();
 
     size_t expLength = m_expression.length();
     std::stack<CValue> values;
     std::stack<COperation> operations;
     bool prevIsOper = true;
 
-    if (m_expression.size() > 0 && m_expression[0] == '=') {
+    if (expLength > 0 && m_expression[0] == '=') {
         for (size_t expPosStart = 1; expPosStart < expLength; expPosStart++) {
             if (isspace(m_expression[expPosStart]))
                 continue;
@@ -91,12 +91,11 @@ void CParserExpression::process() {
                     }
                     else {
                         std::string value = m_expression.substr(expPosStart, expPosEnd - expPosStart);
-                        // mvprintw(25,40,"Cell: %s", value.c_str());
                         toUpperCase(value);
                         if (isValidCell(value)) {
                             Position cellPosition = getCellPosition(value);
+                            m_dependences.insert(cellPosition);
                             if (m_table->checkCell(cellPosition) && !m_table->getCell(cellPosition)->getErrorStatus()) {
-                                m_dependences.insert(cellPosition);
                                 std::string cellValue = m_table->getCell(cellPosition)->getValString();
                                 DataType cellDataType = m_table->getCell(cellPosition)->getValType();
                                 values.push(CValue(cellValue, cellDataType));
@@ -224,7 +223,7 @@ void CParserExpression::process() {
             }
         }
     }
-    else {
+    else if(expLength > 0) {
         if (isNumeric(m_expression)) {
             if (isInteger(m_expression))
                 m_resDataType = DataType::Integer;
@@ -233,6 +232,8 @@ void CParserExpression::process() {
         }
         values.push(CValue(m_expression, m_resDataType));
     }
+    if (values.empty())
+        m_error = true;
     if(!m_error) {
         while(!operations.empty() && operations.top().operation != "(" && !isFunction(operations.top().operation)) {
             COperation op = operations.top();
@@ -259,8 +260,6 @@ void CParserExpression::process() {
             m_resValue = "BadSynt12";
         }
     }
-    
-    // mvprintw(1,0,"Exp: %s | Val: %s | ism_error: %d", m_expression.c_str(), m_resValue.c_str(), (int)m_error);
 }
 
 bool CParserExpression::haveError() const {
