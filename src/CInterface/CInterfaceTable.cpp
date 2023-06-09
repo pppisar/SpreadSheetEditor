@@ -140,7 +140,7 @@ void CInterfaceTable::renderCells() const {
                 if (value.size() > 9) {
                     mvprintw(TABLE_START_POSITION_Y + 1 + row * CELL_HEIGHT,
                              TABLE_START_POSITION_X + 1 + column * CELL_WIDTH,
-                             "%s", std::string(9, ' '));
+                             "%s", std::string(9, ' ').c_str());
                     mvprintw(TABLE_START_POSITION_Y + 1 + row * CELL_HEIGHT,
                              TABLE_START_POSITION_X + 1 + column * CELL_WIDTH,
                              "%.6s...", value.c_str());
@@ -148,7 +148,7 @@ void CInterfaceTable::renderCells() const {
                 else {
                     mvprintw(TABLE_START_POSITION_Y + 1 + row * CELL_HEIGHT,
                              TABLE_START_POSITION_X + 1 + column * CELL_WIDTH,
-                             "%s", std::string(9, ' '));
+                             "%s", std::string(9, ' ').c_str());
                     mvprintw(TABLE_START_POSITION_Y + 1 + row * CELL_HEIGHT,
                              TABLE_START_POSITION_X + 1 + column * CELL_WIDTH,
                              "%.9s", value.c_str());
@@ -157,7 +157,7 @@ void CInterfaceTable::renderCells() const {
             else
                 mvprintw(TABLE_START_POSITION_Y + 1 + row * CELL_HEIGHT,
                          TABLE_START_POSITION_X + 1 + column * CELL_WIDTH,
-                         "%s", std::string(9, ' '));
+                         "%s", std::string(9, ' ').c_str());
         }
     }
 }
@@ -274,12 +274,15 @@ void CInterfaceTable::editCell() {
         }
     }
     curs_set(0);
-
+    mvprintw(1,30,"%d", 9);
+    refresh();
     if (!m_table->checkCell(std::make_pair(m_realX, m_realY)))
         m_table->createCell(std::make_pair(m_realX, m_realY));
-
-    
-    
+    mvprintw(1,30,"%d", 8);
+    refresh();
+    m_table->getCell(std::make_pair(m_realX, m_realY))->update(buffer);
+    mvprintw(1,30,"%d", 7);
+    refresh();
     renderHeader();
     renderCells();
 }

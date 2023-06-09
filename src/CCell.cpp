@@ -7,23 +7,23 @@ void CCell::update(std::string & expression) {
     m_expression = expression;
     CParserExpression parser(m_table, expression);
     parser.process();
-
     // Delete dependencies that have disappeared
     std::vector<Position> lostDependences;
     std::set_difference(m_usesCells.begin(), m_usesCells.end(),
                         parser.getDependences().begin(), parser.getDependences().end(),
-                        lostDependences.begin());
+                        back_inserter(lostDependences));
     for (Position & cellPos: lostDependences)
         m_table->getCell(cellPos)->delDependence(m_position);
-
     // Add dependencies that have appeared
     std::vector<Position> newDependences;
     std::set_difference(parser.getDependences().begin(), parser.getDependences().end(),
                         m_usesCells.begin(), m_usesCells.end(),
-                        newDependences.begin());
-    for (const Position & cellPos: newDependences)
+                        back_inserter(newDependences));
+    for (Position & cellPos: newDependences)
         m_table->getCell(cellPos)->addDependence(m_position);
-
+    m_value = parser.getResValue();
+    m_type = parser.getDataType();
+    m_error = parser.haveError();
     m_usesCells = parser.getDependences();
 
     if (!m_error) {
@@ -31,9 +31,6 @@ void CCell::update(std::string & expression) {
         if (checkLoop(m_position, visitedCells)) {
             visitedCells.clear();
             visitedCells.insert(m_position);
-            m_value = parser.getResValue();
-            m_type = parser.getDataType();
-            m_error = parser.haveError();
             for (const Position & cellPos: m_usedByCells)
                 m_table->getCell(cellPos)->recalc(visitedCells);
         }

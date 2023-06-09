@@ -1,13 +1,13 @@
 #include "CParserExpression.h"
 
-CParserExpression::CParserExpression(CTable* table, std::string expression)
+CParserExpression::CParserExpression(CTable* table, std::string& expression)
 : CParser(table, expression) {}
 
 void CParserExpression::process() {
     m_error = false;
-    m_resValue.clear();
+    // m_resValue.clear();
     m_resDataType = DataType::String;
-    m_dependences.clear();
+    // m_dependences.clear();
 
     size_t expLength = m_expression.length();
     std::stack<CValue> values;
@@ -25,7 +25,7 @@ void CParserExpression::process() {
                         if (!isdigit(m_expression[expPosEnd]) && m_expression[expPosEnd] != '.')
                             break;
                     std::string value = m_expression.substr(expPosStart, expPosEnd - expPosStart);
-                    mvprintw(25,20,"Int val: %s", value.c_str());
+                    // mvprintw(25,20,"Int val: %s", value.c_str());
                     if (isNumeric(value)) {
                         if (isInteger(value))
                             values.push(CValue(value, DataType::Integer));
@@ -92,7 +92,7 @@ void CParserExpression::process() {
                     }
                     else {
                         std::string value = m_expression.substr(expPosStart, expPosEnd - expPosStart);
-                        mvprintw(25,40,"Cell: %s", value.c_str());
+                        // mvprintw(25,40,"Cell: %s", value.c_str());
                         toUpperCase(value);
                         if (isValidCell(value)) {
                             Position cellPosition = getCellPosition(value);
@@ -261,7 +261,7 @@ void CParserExpression::process() {
         }
     }
     
-    mvprintw(1,0,"Exp: %s | Val: %s | ism_error: %d", m_expression.c_str(), m_resValue.c_str(), (int)m_error);
+    // mvprintw(1,0,"Exp: %s | Val: %s | ism_error: %d", m_expression.c_str(), m_resValue.c_str(), (int)m_error);
 }
 
 bool CParserExpression::haveError() const {
@@ -276,6 +276,6 @@ DataType CParserExpression::getDataType() const {
     return m_resDataType;
 }
 
-std::set<Position> CParserExpression::getDependences() const {
+const std::set<Position>& CParserExpression::getDependences() const {
     return m_dependences;
 }

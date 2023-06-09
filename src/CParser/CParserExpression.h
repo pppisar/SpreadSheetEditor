@@ -2,10 +2,13 @@
 #define PYSAROLE_CPARSEREXPRESSION_H
 
 #include "CParser.h"
+#include "../CCell.h"
+#include "../CTable.h"
+#include <ncurses.h> // del
 
 class CParserExpression : public CParser {
 public:
-    CParserExpression(CTable* table, std::string expression);
+    CParserExpression(CTable* table, std::string& expression);
 
     ~CParserExpression() = default;
 
@@ -17,9 +20,9 @@ public:
 
     DataType getDataType() const;
 
-    std::set<Position> getDependences() const;
+    const std::set<Position>& getDependences() const;
 private:
-    bool m_error;
+    bool m_error = false;
     
     std::string m_resValue;
     DataType m_resDataType = DataType::String;

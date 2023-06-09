@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <algorithm>
+#include <ncurses.h> // del
 
 // class CTable; // Direct declaration of the CTable class
 

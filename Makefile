@@ -11,11 +11,13 @@ all: compile run
 compile: $(OBJS)
 	@mkdir -p build
 	@mkdir -p build/CInterface
+	@mkdir -p build/CParser
 	$(LD) $(CXXFLAGS) -o build/EXE $(OBJS) $(LIBS)
 
 build/%.o: src/%.cpp
 	@mkdir -p build
 	@mkdir -p build/CInterface
+	@mkdir -p build/CParser
 	$(CXX) $(CXXFLAGS) -MMD -c -o $@ $<
 
 

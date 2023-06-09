@@ -3,8 +3,6 @@
 
 #include "../CConstants.h"
 #include "../CTable.h"
-#include "../CCell.h"
-#include <ncurses.h> // del
 #include <sstream>
 #include <cmath>
 #include <regex>

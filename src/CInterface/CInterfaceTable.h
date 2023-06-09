@@ -3,6 +3,7 @@
 
 #include "../CConstants.h"
 #include "../CTable.h"
+#include "../CCell.h"
 #include "CInterfaceController.h"
 
 class CInterfaceTable : public CInterfaceController {
