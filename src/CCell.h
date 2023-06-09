@@ -21,7 +21,7 @@ public:
 
     bool checkLoop(Position rootPosition, std::set<Position> & visitedCells);
 
-    void recalc(std::set<Position> & visitedCells);
+    void recalc();
 
     void forceChange(bool error, std::string value, DataType valueType, std::set<Position> & visitedCells);
 

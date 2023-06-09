@@ -29,10 +29,8 @@ void CCell::update(std::string & expression) {
     if (!m_error) {
         std::set<Position> visitedCells;
         if (checkLoop(m_position, visitedCells)) {
-            visitedCells.clear();
-            visitedCells.insert(m_position);
             for (const Position & cellPos: m_usedByCells)
-                m_table->getCell(cellPos)->recalc(visitedCells);
+                m_table->getCell(cellPos)->recalc();
         }
         else {
             visitedCells.clear();
@@ -55,19 +53,16 @@ bool CCell::checkLoop(Position rootPosition, std::set<Position> & visitedCells) 
 }
 
 
-void CCell::recalc(std::set<Position> & visitedCells) {
-    if (visitedCells.find(m_position) == visitedCells.end()) {
-        visitedCells.insert(m_position);
-        CParserExpression parser(m_table, m_expression);
-        parser.process();
+void CCell::recalc() {
+    CParserExpression parser(m_table, m_expression);
+    parser.process();
 
-        m_value = parser.getResValue();
-        m_type = parser.getDataType();
-        m_error = parser.haveError();
+    m_value = parser.getResValue();
+    m_type = parser.getDataType();
+    m_error = parser.haveError();
 
-        for (const Position & cellPos: m_usedByCells)
-            m_table->getCell(cellPos)->recalc(visitedCells);
-    }
+    for (const Position & cellPos: m_usedByCells)
+        m_table->getCell(cellPos)->recalc();
 }
 
 void CCell::forceChange(bool error, std::string value, DataType valueType, std::set<Position> & visitedCells) {
@@ -79,7 +74,7 @@ void CCell::forceChange(bool error, std::string value, DataType valueType, std::
         m_type = valueType;
 
         for (const Position & cellPos: m_usedByCells)
-            m_table->getCell(cellPos)->recalc(visitedCells);
+            m_table->getCell(cellPos)->forceChange(error, value, valueType, visitedCells);
     }
 }
 
