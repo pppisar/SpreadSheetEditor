@@ -5,6 +5,8 @@ CParserExpression::CParserExpression(CTable* table, std::string expression)
 
 void CParserExpression::process() {
     m_error = false;
+    m_resValue.clear();
+    m_resDataType = DataType::String;
     m_dependences.clear();
 
     size_t expLength = m_expression.length();

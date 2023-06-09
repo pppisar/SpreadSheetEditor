@@ -4,7 +4,9 @@
 #include <map>
 
 #include "CConstants.h"
-#include "CCell.h"
+// #include "CCell.h"
+
+class CCell;
 
 class CTable {
 public:

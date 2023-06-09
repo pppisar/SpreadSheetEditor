@@ -7,7 +7,7 @@
 #include <vector>
 #include <set>
 
-class CTable; // Direct declaration of the CTable class
+// class CTable; // Direct declaration of the CTable class
 
 class CCell {
 public:
@@ -15,10 +15,13 @@ public:
 
     ~CCell() = default;
 
-    // Setter
     void update(std::string & expression);
 
-    bool checkLoop(Position rootPosition);
+    bool checkLoop(Position rootPosition, std::set<Position> & visitedCells);
+
+    void recalc(std::set<Position> & visitedCells);
+
+    void forceChange(bool error, std::string value, DataType valueType, std::set<Position> & visitedCells);
 
     void addDependence(Position cell);
 
@@ -36,9 +39,9 @@ public:
 
     std::string getExpression() const;
 private:
+    Position m_position;
     CTable* m_table;
 
-    Position m_position;
     bool m_error;
     std::string m_expression;
     std::string m_value;

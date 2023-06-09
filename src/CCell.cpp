@@ -8,10 +8,6 @@ void CCell::update(std::string & expression) {
     CParserExpression parser(m_table, expression);
     parser.process();
 
-    m_value = parser.getResValue();
-    m_type = parser.getDataType();
-    m_error = parser.haveError();
-
     // Delete dependencies that have disappeared
     std::vector<Position> lostDependences;
     std::set_difference(m_usesCells.begin(), m_usesCells.end(),
@@ -31,23 +27,69 @@ void CCell::update(std::string & expression) {
     m_usesCells = parser.getDependences();
 
     if (!m_error) {
-        if (checkLoop(m_position)) {
-            // TODO: Calculate all cells that depend on it
+        std::set<Position> visitedCells;
+        if (checkLoop(m_position, visitedCells)) {
+            visitedCells.clear();
+            visitedCells.insert(m_position);
+            m_value = parser.getResValue();
+            m_type = parser.getDataType();
+            m_error = parser.haveError();
+            for (const Position & cellPos: m_usedByCells)
+                m_table->getCell(cellPos)->recalc(visitedCells);
         }
         else {
-            // TODO: Set LoopError to all dependent cells
+            visitedCells.clear();
+            visitedCells.insert(m_position);
+            m_value = "LoopError";
+            m_type = DataType::String;
+            m_error = true;
+
+            for (const Position & cellPos: m_usedByCells)
+                m_table->getCell(cellPos)->recalc(visitedCells);
         }
     }
 
 }
 
-bool CCell::checkLoop(Position rootPosition) {
+bool CCell::checkLoop(Position rootPosition, std::set<Position> & visitedCells) {
     if (m_usesCells.find(rootPosition) != m_usesCells.end())
         return false;
-    for (const Position& cellPosition: m_usesCells)
-        if (!m_table->getCell(cellPosition)->checkLoop(rootPosition))
-            return false;
+    if (visitedCells.find(m_position) == visitedCells.end()) {
+        visitedCells.insert(m_position);
+        for (const Position& cellPosition: m_usesCells)
+            if (!m_table->getCell(cellPosition)->checkLoop(rootPosition, visitedCells))
+                return false;
+    }
     return true;
+}
+
+
+void CCell::recalc(std::set<Position> & visitedCells) {
+    if (visitedCells.find(m_position) == visitedCells.end()) {
+        visitedCells.insert(m_position);
+        CParserExpression parser(m_table, m_expression);
+        parser.process();
+
+        m_value = parser.getResValue();
+        m_type = parser.getDataType();
+        m_error = parser.haveError();
+
+        for (const Position & cellPos: m_usedByCells)
+            m_table->getCell(cellPos)->recalc(visitedCells);
+    }
+}
+
+void CCell::forceChange(bool error, std::string value, DataType valueType, std::set<Position> & visitedCells) {
+    if (visitedCells.find(m_position) == visitedCells.end()) {
+        visitedCells.insert(m_position);
+        
+        m_error = error;
+        m_value = value;
+        m_type = valueType;
+
+        for (const Position & cellPos: m_usedByCells)
+            m_table->getCell(cellPos)->recalc(visitedCells);
+    }
 }
 
 void CCell::addDependence(Position cell) {

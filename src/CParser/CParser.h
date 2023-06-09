@@ -10,6 +10,7 @@
 #include <regex>
 #include <string>
 #include <stack>
+#include <set>
 
 class CParser {
 public:

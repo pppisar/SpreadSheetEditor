@@ -1,4 +1,5 @@
 #include "CTable.h"
+#include "CCell.h"
 
 CTable::CTable(const CTable &src) {
     m_table = src.m_table;
@@ -10,7 +11,7 @@ CTable::~CTable() {
 }
 
 void CTable::createCell(Position position) {
-    CCell * cell = new CCell(position);
+    CCell * cell = new CCell(position, this);
     m_table[position] = cell;
 }
 
