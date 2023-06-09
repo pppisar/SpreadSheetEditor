@@ -9,26 +9,30 @@
 typedef std::pair<int, int> Position;
 
 // Types of cell value
-enum DataType {
+enum class DataType {
     String,
     Integer,
     Double
 };
 
-enum Screen {
+enum class Screen {
     Welcome,
+    Alert,
     Help,
     Table,
     Menu
 };
 
-enum MenuOption {
+enum class MenuOption {
     Create,
     Load,
     Save,
     Save_as,
     Exit
 };
+
+const int MIN_WIDTH = 45;
+const int MIN_HEIGTH = 18;
 
 // Table constants
 const unsigned CELL_WIDTH = 10;

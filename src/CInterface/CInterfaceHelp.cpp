@@ -43,18 +43,18 @@ void CInterfaceHelp::renderBody() const {
 }
 
 void CInterfaceHelp::renderFooter() const {
-    int yMax, xMax;
-    getmaxyx(stdscr, yMax, xMax);
+    int terminalHeigth, terminalWidth;
+    getmaxyx(stdscr, terminalHeigth, terminalWidth);
     wattron(stdscr, A_REVERSE);
-    mvprintw(yMax - 1, xMax - 21, "<-");
-    mvprintw(yMax - 1, xMax - 14, "->");
-    mvprintw(yMax - 1, 0, "F1");
-    mvprintw(yMax - 1, 6, "ESC");
+    mvprintw(terminalHeigth - 1, 0, "<-");
+    mvprintw(terminalHeigth - 1, 7, "->");
+    mvprintw(terminalHeigth - 1, terminalWidth - 15, "F1");
+    mvprintw(terminalHeigth - 1, terminalWidth - 9, "ESC");
     wattroff(stdscr, A_REVERSE);
-    mvprintw(yMax-1, xMax - 18, "and");
-    mvprintw(yMax-1, xMax - 11, "CHOOSE PAGE");
-    mvprintw(yMax-1, 3, "or");
-    mvprintw(yMax-1, 10, "CLOSE");
+    mvprintw(terminalHeigth-1, 3, "and");
+    mvprintw(terminalHeigth-1, 10, "CHOOSE PAGE");
+    mvprintw(terminalHeigth-1, terminalWidth - 12, "or");
+    mvprintw(terminalHeigth-1, terminalWidth - 5, "CLOSE");
 }
 
 void CInterfaceHelp::display() {

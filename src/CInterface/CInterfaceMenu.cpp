@@ -36,12 +36,12 @@ void CInterfaceMenu::renderBody() const {
 }
 
 void CInterfaceMenu::renderFooter() const {
-    int yMax, xMax;
-    getmaxyx(stdscr, yMax, xMax);
+    int terminalHeigth, terminalWidth;
+    getmaxyx(stdscr, terminalHeigth, terminalWidth);
     wattron(stdscr, A_REVERSE);
-    mvprintw(yMax - 1, 0, "F1");
+    mvprintw(terminalHeigth - 1, terminalWidth - 7, "F1");
     wattroff(stdscr, A_REVERSE);
-    mvprintw(yMax-1, 3, "HELP");
+    mvprintw(terminalHeigth-1, terminalWidth - 4, "HELP");
 }
 
 

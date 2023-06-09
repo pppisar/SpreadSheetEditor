@@ -36,13 +36,15 @@ void CInterfaceWelcome::renderBody() const {
 }
 
 void CInterfaceWelcome::renderFooter() const {
-    int yMax, xMax;
-    getmaxyx(stdscr, yMax, xMax);
+    int terminalHeigth, terminalWidth;
+    getmaxyx(stdscr, terminalHeigth, terminalWidth);
+
+    mvprintw(terminalHeigth-1, 0, "Made by Pysarenko Oleksii (pysarole)");
+
     wattron(stdscr, A_REVERSE);
-    mvprintw(yMax - 1, 0, "F1");
+    mvprintw(terminalHeigth - 1, terminalWidth - 7, "F1");
     wattroff(stdscr, A_REVERSE);
-    mvprintw(yMax-1, 3, "HELP");
-    mvprintw(yMax-1, xMax - 36, "Made by Pysarenko Oleksii (pysarole)");
+    mvprintw(terminalHeigth-1, terminalWidth - 4, "HELP");
 }
 
 

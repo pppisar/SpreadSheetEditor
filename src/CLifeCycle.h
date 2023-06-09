@@ -8,6 +8,7 @@
 #include "CTable.h"
 #include "CInterface/CInterfaceController.h"
 #include "CInterface/CInterfaceWelcome.h"
+#include "CInterface/CInterfaceAlert.h"
 #include "CInterface/CInterfaceHelp.h"
 #include "CInterface/CInterfaceMenu.h"
 #include "CInterface/CInterfaceTable.h"
@@ -23,6 +24,7 @@ public:
     void run();
 private:
     CInterfaceWelcome * m_welcomeInterface;
+    CInterfaceAlert * m_alertInterface;
     CInterfaceHelp * m_helpInterface;
     CInterfaceMenu * m_menuInterface;
     CInterfaceTable * m_tableInterface;

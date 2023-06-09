@@ -173,12 +173,12 @@ void CInterfaceTable::renderFooter() const {
     hline(0, m_terminalWidth);
 
     wattron(stdscr, A_REVERSE);
-    mvprintw(m_terminalHeight - 1, 0, "F1");
-    mvprintw(m_terminalHeight - 1, 8, "|");
-    mvprintw(m_terminalHeight - 1, 10, "ESC");
+    mvprintw(m_terminalHeight - 1, m_terminalWidth-18, "F1");
+    mvprintw(m_terminalHeight - 1, m_terminalWidth-10, "|");
+    mvprintw(m_terminalHeight - 1, m_terminalWidth-8, "ESC");
     wattroff(stdscr, A_REVERSE);
-    mvprintw(m_terminalHeight-1, 3, "HELP");
-    mvprintw(m_terminalHeight-1, 14, "MENU");
+    mvprintw(m_terminalHeight-1, m_terminalWidth-15, "HELP");
+    mvprintw(m_terminalHeight-1, m_terminalWidth-4, "MENU");
 }
 
 void CInterfaceTable::display() {
