@@ -25,7 +25,6 @@ void CParserExpression::process() {
                         if (!isdigit(m_expression[expPosEnd]) && m_expression[expPosEnd] != '.')
                             break;
                     std::string value = m_expression.substr(expPosStart, expPosEnd - expPosStart);
-                    // mvprintw(25,20,"Int val: %s", value.c_str());
                     if (isNumeric(value)) {
                         if (isInteger(value))
                             values.push(CValue(value, DataType::Integer));
@@ -101,7 +100,7 @@ void CParserExpression::process() {
                                 std::string cellValue = m_table->getCell(cellPosition)->getValString();
                                 DataType cellDataType = m_table->getCell(cellPosition)->getValType();
                                 values.push(CValue(cellValue, cellDataType));
-                                expPosStart = expPosEnd;
+                                expPosStart = expPosEnd - 1;
                                 prevIsOper = false;
                             }
                             else {

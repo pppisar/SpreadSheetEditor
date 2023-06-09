@@ -36,13 +36,7 @@ void CCell::update(std::string & expression) {
         }
         else {
             visitedCells.clear();
-            visitedCells.insert(m_position);
-            m_value = "LoopError";
-            m_type = DataType::String;
-            m_error = true;
-
-            for (const Position & cellPos: m_usedByCells)
-                m_table->getCell(cellPos)->recalc(visitedCells);
+            forceChange(true, "LoopError", DataType::String, visitedCells);
         }
     }
 

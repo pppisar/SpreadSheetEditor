@@ -43,7 +43,7 @@ bool CParser::isValidCell(const std::string& cell) const {
 }
 
 Position CParser::getCellPosition(std::string link) const {
-    int y, x;
+    int y = 0, x = 0;
 
     int i = 0;
     for (; isalpha(link[i]); i++)
@@ -51,7 +51,7 @@ Position CParser::getCellPosition(std::string link) const {
     
     y = std::stoi(link.substr(i));
     
-    return std::make_pair(x, y);
+    return std::make_pair(x - 1, y);
 }
 
 unsigned CParser::getPriority(std::string op) const {
@@ -78,7 +78,7 @@ bool CParser::execOperation(COperation& op,
                             CValue& resEval) {
     bool error = false;
     DataType resType = DataType::String;
-    mvprintw(25,20,"Int val: %s %s %s", argument1.value.c_str(), op.operation.c_str(), argument2.value.c_str());
+    // mvprintw(25,20,"Int val: %s %s %s", argument1.value.c_str(), op.operation.c_str(), argument2.value.c_str());
     std::string resValue;
     if (op.operation == "+") {
         if (argument1.type != DataType::String && argument2.type != DataType::String) {
