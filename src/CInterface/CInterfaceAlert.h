@@ -17,7 +17,7 @@ public:
 
     // (re)Render welcome page
     void display() override;
-private:
+protected:
     void renderHeader() const override;
     void renderBody() const override;
     void renderFooter() const override;

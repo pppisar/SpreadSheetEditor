@@ -106,7 +106,7 @@ void CLifeCycle::run() {
                                     changeScreen(Screen::Table);
                                     break;
                                 case MenuOption::Load:
-                                    m_fileName = m_welcomeInterface->getFileName();
+                                    m_fileName = m_welcomeInterface->getFileName("Load");
                                     break;
                                 case MenuOption::Exit:
                                     return;
@@ -117,12 +117,66 @@ void CLifeCycle::run() {
                         else if (m_currentScreen == Screen::Menu) {
                             switch (m_menuInterface->getSelected()) {
                             case MenuOption::Create:
+                                changeScreen(Screen::Table);
                                 break;
                             case MenuOption::Load:
+                                if(m_table->isChanged() &&  !m_table->isNamed())
+                                    m_fileName = m_menuInterface->getFileName("Save");
+                                if(m_table->isChanged())
+                                    // TODO: Save Table
+                                m_fileName = m_menuInterface->getFileName("Load");
+                                // TODO: Load Table
+                                changeScreen(Screen::Table);
                                 break;
                             case MenuOption::Save:
+                                if(m_table->isChanged() &&  !m_table->isNamed()) {
+                                    m_fileName = m_menuInterface->getFileName("Save");
+                                    m_table->setNamed(true);
+                                }
+                                if(m_table->isChanged()) {
+                                    if (m_fileName.second == FileType::Binary) {
+                                        CStateBinary stateManager(m_table, m_fileName.first, m_path);
+                                        if (stateManager.save()) {
+                                            m_table->setChange(false);
+                                            changeScreen(Screen::Table);
+                                        }
+                                        else {
+                                            move(m_terminalHeight - 2, 0);
+                                            clrtoeol();
+                                            move(m_terminalHeight - 1, 0);
+                                            clrtoeol();
+
+                                            mvprintw(m_terminalHeight - 1, 0, "Something goes wrong!");
+                                            getch();
+                                            m_menuInterface->display();
+                                        }
+                                    }
+                                }
                                 break;
                             case MenuOption::Save_as:
+                                m_fileName = m_menuInterface->getFileName("Save");
+                                m_table->setNamed(true);
+                                if (m_fileName.second == FileType::Binary) {
+                                    CStateBinary stateManager(m_table, m_fileName.first, m_path);
+                                    // TODO: if save return false => in footer write about 
+                                    // error and rerender footer after pressing of any button
+                                    if (stateManager.save()) {
+                                        m_table->setChange(false);
+                                        changeScreen(Screen::Table);
+                                    }
+                                    else {
+                                        move(m_terminalHeight - 2, 0);
+                                        clrtoeol();
+                                        move(m_terminalHeight - 1, 0);
+                                        clrtoeol();
+
+                                        mvprintw(m_terminalHeight - 1, 0, "Something goes wrong!");
+                                        getch();
+                                        m_menuInterface->display();
+                                    }
+                                }
+                                m_table->setChange(false);
+                                changeScreen(Screen::Table);
                                 break;
                             case MenuOption::Exit:
                                 return;

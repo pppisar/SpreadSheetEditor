@@ -10,11 +10,37 @@ CTable::~CTable() {
         delete it.second;
 }
 
+// Setters
+
 void CTable::createCell(Position position) {
     if (!checkCell(position)) {
         CCell * cell = new CCell(position, this);
         m_table[position] = cell;
     }
+}
+
+void CTable::setChange(bool isChanged) {
+    m_isChanged = isChanged;
+}
+
+void CTable::setNamed(bool isNamed) {
+    m_isNamed = isNamed;
+}
+
+void CTable::evaluateDependences() {
+    
+}
+
+
+// Getters
+
+const std::map<Position, CCell*> & CTable::getTable() const {
+    return m_table;
+}
+
+CCell* CTable::getCell(Position position) const {
+    auto it = m_table.find(position);
+    return it->second;
 }
 
 bool CTable::checkCell(Position position) const {
@@ -23,11 +49,10 @@ bool CTable::checkCell(Position position) const {
     return true;
 }
 
-CCell* CTable::getCell(Position position) const {
-    auto it = m_table.find(position);
-    return it->second;
+bool CTable::isNamed() const {
+    return m_isNamed;
 }
 
-void CTable::evaluate() {
-    
+bool CTable::isChanged() const {
+    return m_isChanged;
 }

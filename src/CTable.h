@@ -4,7 +4,6 @@
 #include <map>
 
 #include "CConstants.h"
-// #include "CCell.h"
 
 class CCell;
 
@@ -16,16 +15,33 @@ public:
 
     virtual ~CTable();
 
-    // Setter
+
+    // Setters
+
     void createCell(Position position);
+
+    void setChange(bool isChanged);
+
+    void setNamed(bool isNamed);
+    
+    void evaluateDependences(); 
+
+
+    // Getters
+
+    const std::map<Position, CCell*> & getTable() const;
+
+    CCell * getCell(Position position) const;
 
     bool checkCell(Position position) const;
 
-    // Getter
-    CCell * getCell(Position position) const;
+    bool isNamed() const;
 
-    void evaluate(); 
+    bool isChanged() const;
 private:
+    bool m_isNamed = false;
+    bool m_isChanged = false;
+
     std::map<Position, CCell*> m_table;
 };
 

@@ -13,6 +13,7 @@
 #include "CInterface/CInterfaceHelp.h"
 #include "CInterface/CInterfaceMenu.h"
 #include "CInterface/CInterfaceTable.h"
+#include "CState/CStateBinary.h"
 
 class CLifeCycle {
 public:
@@ -22,7 +23,7 @@ public:
 
     void run();
 private:
-    std::string m_path;
+    std::string m_path = "examples/";
     FileName m_fileName;
 
     CInterfaceWelcome * m_welcomeInterface;
@@ -42,8 +43,6 @@ private:
     int m_terminalHeight;
 
     void changeScreen(const Screen screen);
-
-
 };
 
 

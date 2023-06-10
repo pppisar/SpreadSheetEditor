@@ -8,8 +8,6 @@
 #include <set>
 #include <algorithm>
 
-// class CTable; // Direct declaration of the CTable class
-
 class CCell {
 public:
     CCell(Position position, CTable* table);

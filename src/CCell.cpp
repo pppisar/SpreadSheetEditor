@@ -32,6 +32,9 @@ void CCell::update(std::string & expression) {
     m_error = parser.haveError();
     m_usesCells = parser.getDependences();
 
+    if (!m_error || !m_value.empty())
+        m_table->setChange(true);
+
     if (!m_error) {
         std::set<Position> visitedCells;
         if (checkLoop(m_position, visitedCells)) {
@@ -60,7 +63,6 @@ bool CCell::checkLoop(Position rootPosition, std::set<Position> & visitedCells) 
     }
     return true;
 }
-
 
 void CCell::recalc() {
     CParserExpression parser(m_table, m_expression);
@@ -93,6 +95,10 @@ void CCell::addDependence(Position cell) {
 
 void CCell::delDependence(Position cell) {
     m_usedByCells.erase(cell);
+}
+
+Position CCell::getPosition() const {
+    return m_position;
 }
 
 bool CCell::getErrorStatus() const {

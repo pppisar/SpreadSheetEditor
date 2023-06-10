@@ -12,12 +12,14 @@ compile: $(OBJS)
 	@mkdir -p build
 	@mkdir -p build/CInterface
 	@mkdir -p build/CParser
+	@mkdir -p build/CState
 	$(LD) $(CXXFLAGS) -o build/EXE $(OBJS) $(LIBS)
 
 build/%.o: src/%.cpp
 	@mkdir -p build
 	@mkdir -p build/CInterface
 	@mkdir -p build/CParser
+	@mkdir -p build/CState
 	$(CXX) $(CXXFLAGS) -MMD -c -o $@ $<
 
 

@@ -88,13 +88,14 @@ std::string CInterfaceController::readInputString(unsigned startY, unsigned star
     return buffer;
 }
 
-FileName CInterfaceController::getFileName() const {
+FileName CInterfaceController::getFileName(std::string forWhat) const {
     std::string fileName;
     FileType type = FileType::Binary;
 
     move(m_terminalHeight - 2, 0);
     clrtoeol();
-    mvprintw(m_terminalHeight - 2, 0, "Enter file name(without extention):");
+    mvprintw(m_terminalHeight - 2, 0, "%s: Enter file name(without extention):", 
+                                       forWhat.c_str());
 
     move(m_terminalHeight - 1, 0);
     clrtoeol();
@@ -102,7 +103,8 @@ FileName CInterfaceController::getFileName() const {
 
     move(m_terminalHeight - 2, 0);
     clrtoeol();
-    mvprintw(m_terminalHeight - 2, 0, "Choose file extention: (<- and -> to choose and Enter to aproove)");
+    mvprintw(m_terminalHeight - 2, 0, "%s: Choose file extention: (<- and -> to choose and Enter to aproove)", 
+                                       forWhat.c_str());
     int choosenType = 0;
 
     move(m_terminalHeight - 1, 0);
