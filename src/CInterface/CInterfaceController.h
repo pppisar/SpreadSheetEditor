@@ -1,6 +1,7 @@
 #ifndef PYSAROLE_CINTERFACECONTROLLER_H
 #define PYSAROLE_CINTERFACECONTROLLER_H
 
+#include "../CConstants.h"
 #include <ncurses.h>
 #include <string>
 
@@ -18,10 +19,12 @@ public:
     // Function to display information to the console.
     virtual void display() = 0;
 
-private:
+protected:
     virtual void renderHeader() const = 0;
     virtual void renderBody() const = 0;
     virtual void renderFooter() const = 0;
+
+    std::string readInputString(unsigned startY, unsigned startX, std::string buffer) const;
 };
 
 
