@@ -18,7 +18,7 @@ public:
     // Render screen with information on how to use the application
     void display() override;
 
-private:
+protected:
     int m_selected = 0;
 
     void renderHeader() const override;

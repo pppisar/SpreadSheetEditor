@@ -21,6 +21,14 @@ public:
 
     // Render table with all auxiliary controls
     void display() override;
+protected:
+    void renderHeader() const override;
+
+    // (re)render table
+    void renderBody() const override;
+
+    // render footer of the application
+    void renderFooter() const override;
 private:
     CTable * m_table;
 
@@ -35,16 +43,11 @@ private:
     
     unsigned m_tableHeight;
 
-    int m_terminalWidth;
-    int m_terminalHeight;
-
     int m_rowCount;
     int m_columnCount;
 
 private:
     void changePosition(int x, int y);
-
-    void renderHeader() const override;
 
     void renderGrid() const;
 
@@ -54,12 +57,6 @@ private:
     void renderRCTitle() const;
 
     void renderCells() const;
-
-    // (re)render table
-    void renderBody() const override;
-
-    // render footer of the application
-    void renderFooter() const override;
 
     void editCell(unsigned startY, unsigned startX);
 

@@ -10,14 +10,11 @@ void CInterfaceAlert::renderHeader() const {
 }
 
 void CInterfaceAlert::renderBody() const {
-    int terminalHeigth, terminalWidth;
-    getmaxyx(stdscr, terminalHeigth, terminalWidth);
-
     mvprintw(2, 0, "Minimal width: %d", MIN_WIDTH);
     mvprintw(3, 0, "Minimal heigth: %d", MIN_HEIGTH);
 
-    mvprintw(5, 0, "Actual width: %d", terminalWidth);
-    mvprintw(6, 0, "Actual heigth: %d", terminalHeigth);
+    mvprintw(5, 0, "Actual width: %d", m_terminalWidth);
+    mvprintw(6, 0, "Actual height: %d", m_terminalHeight);
 
 }
 
@@ -28,6 +25,7 @@ void CInterfaceAlert::renderFooter() const {
 
 
 void CInterfaceAlert::display() {
+    updateTerminalSize();
     clear();
     renderHeader();
     renderBody();

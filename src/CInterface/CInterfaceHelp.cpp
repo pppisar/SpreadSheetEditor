@@ -43,21 +43,23 @@ void CInterfaceHelp::renderBody() const {
 }
 
 void CInterfaceHelp::renderFooter() const {
-    int terminalHeigth, terminalWidth;
-    getmaxyx(stdscr, terminalHeigth, terminalWidth);
+    move(m_terminalHeight-2, 0);
+    hline(0, m_terminalWidth);
+
     wattron(stdscr, A_REVERSE);
-    mvprintw(terminalHeigth - 1, 0, "<-");
-    mvprintw(terminalHeigth - 1, 7, "->");
-    mvprintw(terminalHeigth - 1, terminalWidth - 15, "F1");
-    mvprintw(terminalHeigth - 1, terminalWidth - 9, "ESC");
+    mvprintw(m_terminalHeight - 1, 0, "<-");
+    mvprintw(m_terminalHeight - 1, 7, "->");
+    mvprintw(m_terminalHeight - 1, m_terminalWidth - 15, "F1");
+    mvprintw(m_terminalHeight - 1, m_terminalWidth - 9, "ESC");
     wattroff(stdscr, A_REVERSE);
-    mvprintw(terminalHeigth-1, 3, "and");
-    mvprintw(terminalHeigth-1, 10, "CHOOSE PAGE");
-    mvprintw(terminalHeigth-1, terminalWidth - 12, "or");
-    mvprintw(terminalHeigth-1, terminalWidth - 5, "CLOSE");
+    mvprintw(m_terminalHeight-1, 3, "and");
+    mvprintw(m_terminalHeight-1, 10, "CHOOSE PAGE");
+    mvprintw(m_terminalHeight-1, m_terminalWidth - 12, "or");
+    mvprintw(m_terminalHeight-1, m_terminalWidth - 5, "CLOSE");
 }
 
 void CInterfaceHelp::display() {
+    updateTerminalSize();
     clear();
     renderHeader();
     renderBody();

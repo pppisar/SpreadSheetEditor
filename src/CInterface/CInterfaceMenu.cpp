@@ -36,16 +36,23 @@ void CInterfaceMenu::renderBody() const {
 }
 
 void CInterfaceMenu::renderFooter() const {
-    int terminalHeigth, terminalWidth;
-    getmaxyx(stdscr, terminalHeigth, terminalWidth);
+    move(m_terminalHeight-2, 0);
+    hline(0, m_terminalWidth);
+
+    move(m_terminalHeight - 1, 0);
+    clrtoeol();
+
+    //FileName
+
     wattron(stdscr, A_REVERSE);
-    mvprintw(terminalHeigth - 1, terminalWidth - 7, "F1");
+    mvprintw(m_terminalHeight - 1, m_terminalWidth - 7, "F1");
     wattroff(stdscr, A_REVERSE);
-    mvprintw(terminalHeigth-1, terminalWidth - 4, "HELP");
+    mvprintw(m_terminalHeight-1, m_terminalWidth - 4, "HELP");
 }
 
 
 void CInterfaceMenu::display() {
+    updateTerminalSize();
     clear();
     renderHeader();
     renderBody();

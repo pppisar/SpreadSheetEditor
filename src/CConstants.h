@@ -5,9 +5,6 @@
 #include <string>
 #include <map>
 
-// Own types
-typedef std::pair<int, int> Position;
-
 // Types of cell value
 enum class DataType {
     String,
@@ -31,6 +28,17 @@ enum class MenuOption {
     Exit
 };
 
+// File extension for storing the table
+enum class FileType {
+    Binary,
+    Txt
+};
+
+typedef std::pair<int, int> Position;
+
+typedef std::pair<std::string, FileType> FileName;
+
+// Minimum terminal size
 const int MIN_WIDTH = 45;
 const int MIN_HEIGTH = 18;
 
@@ -58,16 +66,24 @@ const std::string CHOICES_MENU[5] = {
     "EXIT"
 };
 
+// Help screen menu
 const std::string CHOISE_HELP[3] = {
     "NAVIGATION",
     "EDITING",
     "FUNCTIONS"
 };
 
+// Help screen text
 const std::string TEXT_HELP[3] = {
     "Some text about NAVIGATION",
     "Some text about EDITING",
     "Some text about FUNCTIONS"
+};
+
+// Help screen text
+const std::string FILETYPE_NAME[2] = {
+    "Binary",
+    "Txt"
 };
 
 #endif //PYSAROLE_CCONSTANTS_H

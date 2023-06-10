@@ -1,5 +1,9 @@
 #include "CInterfaceController.h"
 
+void CInterfaceController::updateTerminalSize() {
+    getmaxyx(stdscr, m_terminalHeight, m_terminalWidth);
+}
+
 std::string CInterfaceController::readInputString(unsigned startY, unsigned startX, std::string buffer) const {
     unsigned formLen = MIN_WIDTH - startX - 1;
     unsigned bufferStart, bufferEnd = buffer.length();
@@ -82,4 +86,62 @@ std::string CInterfaceController::readInputString(unsigned startY, unsigned star
     curs_set(0);
 
     return buffer;
+}
+
+FileName CInterfaceController::getFileName() const {
+    std::string fileName;
+    FileType type = FileType::Binary;
+
+    move(m_terminalHeight - 2, 0);
+    clrtoeol();
+    mvprintw(m_terminalHeight - 2, 0, "Enter file name(without extention):");
+
+    move(m_terminalHeight - 1, 0);
+    clrtoeol();
+    fileName = readInputString(m_terminalHeight - 1, 0, fileName);
+
+    move(m_terminalHeight - 2, 0);
+    clrtoeol();
+    mvprintw(m_terminalHeight - 2, 0, "Choose file extention: (<- and -> to choose and Enter to aproove)");
+    int choosenType = 0;
+
+    move(m_terminalHeight - 1, 0);
+    clrtoeol();
+
+    int inpChar;
+    while(true) {
+        unsigned usedSpace = 0;
+        for (int i = 0; i < 2; i++) {
+            if (i == choosenType) {
+                wattron(stdscr, A_REVERSE);
+            }
+            mvprintw(m_terminalHeight - 1, usedSpace, "%s", FILETYPE_NAME[i].c_str());
+            usedSpace += FILETYPE_NAME[i].length() + 1;
+            wattroff(stdscr, A_REVERSE);
+        }
+
+        inpChar = getch();
+
+        if (inpChar == KEY_LEFT)
+            choosenType = 0;
+        else if (inpChar == KEY_RIGHT)
+            choosenType = 1;
+        else if (inpChar == '\n' || inpChar == KEY_ENTER)
+            break;
+    }
+
+    switch (choosenType) {
+        case 0:
+            type = FileType::Binary;
+            break;
+        case 1:
+            type = FileType::Txt;
+            break;
+        default:
+            break;
+    }
+
+    renderFooter();
+
+    return std::make_pair(fileName, type);
 }

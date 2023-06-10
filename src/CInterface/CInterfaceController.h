@@ -11,6 +11,8 @@ public:
 
     virtual ~CInterfaceController() = default;
 
+    virtual FileName getFileName() const;
+
     virtual void reset() = 0;
 
     // Standard navigation
@@ -23,8 +25,12 @@ protected:
     virtual void renderHeader() const = 0;
     virtual void renderBody() const = 0;
     virtual void renderFooter() const = 0;
-
-    std::string readInputString(unsigned startY, unsigned startX, std::string buffer) const;
+protected:
+    int m_terminalWidth = getmaxy(stdscr);
+    int m_terminalHeight = getmaxx(stdscr);
+protected:
+    virtual void updateTerminalSize();
+    virtual std::string readInputString(unsigned startY, unsigned startX, std::string buffer) const;
 };
 
 

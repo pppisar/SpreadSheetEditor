@@ -3,6 +3,7 @@
 
 #include <map>
 #include <ncurses.h>
+#include <string>
 
 #include "CConstants.h"
 #include "CTable.h"
@@ -19,10 +20,11 @@ public:
 
     ~CLifeCycle();
 
-    void changeScreen(const Screen screen);
-
     void run();
 private:
+    std::string m_path;
+    FileName m_fileName;
+
     CInterfaceWelcome * m_welcomeInterface;
     CInterfaceAlert * m_alertInterface;
     CInterfaceHelp * m_helpInterface;
@@ -38,6 +40,10 @@ private:
 
     int m_terminalWidth;
     int m_terminalHeight;
+
+    void changeScreen(const Screen screen);
+
+
 };
 
 

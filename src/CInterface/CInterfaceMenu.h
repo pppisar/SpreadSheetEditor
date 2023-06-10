@@ -20,7 +20,7 @@ public:
 
     // Get selected item
     MenuOption getSelected() const;
-private:
+protected:
     void renderHeader() const override;
     void renderBody() const override;
     void renderFooter() const override;

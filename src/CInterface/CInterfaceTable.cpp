@@ -189,8 +189,8 @@ void CInterfaceTable::renderFooter() const {
 }
 
 void CInterfaceTable::display() {
+    updateTerminalSize();
     clear();
-    getmaxyx(stdscr, m_terminalHeight, m_terminalWidth);
     m_tableHeight = m_terminalHeight - HEADER_HEIGHT - FOOTER_HEIGHT;
     m_rowCount = (m_tableHeight - CELL_HEIGHT) / CELL_HEIGHT;
     m_columnCount = (m_terminalWidth - CELL_WIDTH/2) / CELL_WIDTH;

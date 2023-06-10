@@ -35,6 +35,7 @@ CLifeCycle::CLifeCycle() {
     // Set welcome screen
     m_previousScreen = m_currentScreen = Screen::Welcome;
     changeScreen(m_currentScreen);
+    m_welcomeInterface->display();
 }
 
 CLifeCycle::~CLifeCycle() {
@@ -105,6 +106,7 @@ void CLifeCycle::run() {
                                     changeScreen(Screen::Table);
                                     break;
                                 case MenuOption::Load:
+                                    m_fileName = m_welcomeInterface->getFileName();
                                     break;
                                 case MenuOption::Exit:
                                     return;

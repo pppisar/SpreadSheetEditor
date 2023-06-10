@@ -1,5 +1,8 @@
 #include "CInterfaceWelcome.h"
 
+CInterfaceWelcome::CInterfaceWelcome()
+: CInterfaceController() {}
+
 void CInterfaceWelcome::reset() {
     m_selected = 0;
 }
@@ -21,7 +24,6 @@ void CInterfaceWelcome::action(int actKey) {
     }
 }
 
-
 void CInterfaceWelcome::renderHeader() const {
     mvprintw(0, 0, "Welcome to the Simple Sheets");
 }
@@ -36,20 +38,23 @@ void CInterfaceWelcome::renderBody() const {
 }
 
 void CInterfaceWelcome::renderFooter() const {
-    int terminalHeigth, terminalWidth;
-    getmaxyx(stdscr, terminalHeigth, terminalWidth);
+    move(m_terminalHeight-2, 0);
+    hline(0, m_terminalWidth);
 
-    mvprintw(terminalHeigth-1, 0, "Made by Pysarenko Oleksii (pysarole)");
+    move(m_terminalHeight - 1, 0);
+    clrtoeol();
 
+    mvprintw(m_terminalHeight-1, 0, "Made by Pysarenko Oleksii (pysarole)");
     wattron(stdscr, A_REVERSE);
-    mvprintw(terminalHeigth - 1, terminalWidth - 7, "F1");
+    mvprintw(m_terminalHeight - 1, m_terminalWidth - 7, "F1");
     wattroff(stdscr, A_REVERSE);
-    mvprintw(terminalHeigth-1, terminalWidth - 4, "HELP");
+    mvprintw(m_terminalHeight-1, m_terminalWidth - 4, "HELP");
 }
 
 
 void CInterfaceWelcome::display() {
     clear();
+    updateTerminalSize();
     renderHeader();
     renderBody();
     renderFooter();
