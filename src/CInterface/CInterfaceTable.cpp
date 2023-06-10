@@ -29,7 +29,7 @@ void CInterfaceTable::action(int actKey) {
             break;
         case '\n':
         case KEY_ENTER:
-            editCell();
+            editCell(3, 12);
             break;
     }
 }
@@ -47,16 +47,23 @@ void CInterfaceTable::renderHeader() const {
     // Clear lines and render new one
     move(0, 0);
     clrtoeol();
+    
     mvprintw(0, 0, "Position: (row = %d, column = %s)",
              m_realY, numToAlpha(m_realX).c_str());
 
     move(2, 0);
     clrtoeol();
-    mvprintw(2, 0, "Value: %s", value.c_str());
+    if (value.length() + 7 > MIN_WIDTH)
+        mvprintw(2, 0, "Value: %s...", value.substr(0, MIN_WIDTH - 10).c_str());
+    else
+        mvprintw(2, 0, "Value: %s", value.c_str());
 
     move(3, 0);
     clrtoeol();
-    mvprintw(3, 0, "Expression: %s", expression.c_str());
+    if (expression.length() + 12 > MIN_WIDTH)
+        mvprintw(3, 0, "Expression: %s...", expression.substr(0, MIN_WIDTH - 15).c_str());
+    else
+        mvprintw(3, 0, "Expression: %s", expression.c_str());
 
     // Border
     move(4, 0);
@@ -222,42 +229,67 @@ void CInterfaceTable::changePosition(int x, int y) {
     renderCells();
 }
 
-void CInterfaceTable::editCell() {
-    curs_set(1);
-
+void CInterfaceTable::editCell(unsigned startY, unsigned startX) {
+    unsigned formLen = MIN_WIDTH - startX - 1;
+    
     std::string buffer;
+    unsigned bufferStart, bufferEnd;
 
     if (m_table->checkCell(std::make_pair(m_realX, m_realY)))
         buffer = m_table->getCell(std::make_pair(m_realX, m_realY))->getExpression();
-
-    int y = 3, x = 12;
-
-    mvprintw(y, x, "%s", buffer.c_str());
-    x += (int)buffer.size();
+    bufferEnd = buffer.length();
+    unsigned x = startX + buffer.length();
+    if (x >= MIN_WIDTH) {
+        x = MIN_WIDTH - 1;
+        bufferStart = bufferEnd - formLen;
+    }
+    else
+        bufferStart = 0;
 
     int ch;
     bool isEditing = true;
-
+    curs_set(1);
     while (isEditing) {
-        ch = mvgetch(y, x);
+        mvprintw(1, 0, "X = %d | Start = %d | End = %d  ", x, bufferStart, bufferEnd); 
+        move(startY, startX);
+        clrtoeol();
+        mvprintw(startY, startX, "%s", buffer.substr(bufferStart, bufferEnd-bufferStart).c_str());
+        ch = mvgetch(startY, x);
 
         switch (ch) {
             case KEY_LEFT:
-                if (x > 12)
+                if (x > startX)
                     x--;
+                else if (x == startX && bufferStart > 0) {
+                    bufferStart--;
+                    bufferEnd--;
+                }
                 break;
             case KEY_RIGHT:
-                if (x != (int)buffer.size())
+                if (x == MIN_WIDTH - 1 && bufferEnd != buffer.length()) {
+                    bufferStart++;
+                    bufferEnd++;
+                }
+                else if (x != MIN_WIDTH - 1 && x - startX + bufferStart != buffer.length())
                     x++;
                 break;
             case KEY_DC: // Delete key
             case 127:   // Backspace key
             case KEY_BACKSPACE: // Backspace key
-                if (x > 12) {
-                    x--;
-                    move(y, x);
-                    delch();
-                    buffer.erase(x - 12);
+                if (x > startX) {
+                    if (bufferEnd == buffer.length() && bufferStart != 0) {
+                        buffer.erase(x - startX + bufferStart - 1, 1);
+                        bufferStart--;
+                        bufferEnd--;
+                    }
+                    else if (bufferEnd != buffer.length()) {
+                        buffer.erase(x - startX + bufferStart - 1, 1);
+                    }
+                    else {
+                        buffer.erase(x - startX + bufferStart - 1, 1);
+                        bufferEnd--;
+                        x--;
+                    }
                 }
                 break;
             case '\n':
@@ -265,11 +297,21 @@ void CInterfaceTable::editCell() {
                 delch();
                 isEditing = false;
                 break;
+            case KEY_UP:
+            case KEY_DOWN:
+                break;
             default:
-                printw("%c", ch);
-                std::string ins = { (char)ch };
-                buffer.insert(x - 12, ins);
-                x++;
+                buffer.insert(x - startX + bufferStart, std::string(1, ch));
+                if (x == MIN_WIDTH - 1) {
+                    bufferStart++;
+                    bufferEnd++;
+                }
+                else {
+                    x++;
+                    if (bufferEnd - bufferStart != formLen)
+                        bufferEnd++;
+                    // mvprintw(1, 0, "End - Start = %d      ", bufferEnd - bufferStart);
+                }        
                 break;
         }
     }

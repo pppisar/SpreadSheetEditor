@@ -61,7 +61,7 @@ private:
     // render footer of the application
     void renderFooter() const override;
 
-    void editCell();
+    void editCell(unsigned startY, unsigned startX);
 
     std::string numToAlpha(int num) const;
 };
