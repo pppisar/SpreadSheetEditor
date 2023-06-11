@@ -39,11 +39,6 @@ void CTable::setName(const FileName& fileName) {
     m_isChanged = false;
 }
 
-void CTable::evaluateDependences() {
-    for (auto & it: m_table)
-        it.second->updateDependences();
-}
-
 
 // Getters
 

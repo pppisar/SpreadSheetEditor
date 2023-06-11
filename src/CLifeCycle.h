@@ -24,8 +24,16 @@
 
 class CLifeCycle {
 public:
+    /**
+     * Constructor
+     * Starts the application interface
+    */
     CLifeCycle();
 
+    /**
+     * Destructor
+     * Terminates the application
+    */
     ~CLifeCycle();
 
     /**
