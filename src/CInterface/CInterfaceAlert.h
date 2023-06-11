@@ -6,7 +6,7 @@
 
 class CInterfaceAlert : public CInterfaceController {
 public:
-    CInterfaceAlert() = default;
+    CInterfaceAlert();
 
     virtual ~CInterfaceAlert() = default;
 

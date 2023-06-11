@@ -24,6 +24,28 @@ void CInterfaceWelcome::action(int actKey) {
     }
 }
 
+void CInterfaceWelcome::display() {
+    clear();
+    updateTerminalSize();
+    reset();
+    renderHeader();
+    renderBody();
+    renderFooter();
+}
+
+MenuOption CInterfaceWelcome::getSelected() const {
+    switch (m_selected) {
+        case 0:
+            return MenuOption::Create;
+        case 1:
+            return MenuOption::Load;
+        case 2:
+            return MenuOption::Exit;
+        default:
+            return MenuOption::Create;
+    }
+}
+
 void CInterfaceWelcome::renderHeader() const {
     mvprintw(0, 0, "Welcome to the Simple Sheets");
 }
@@ -49,26 +71,4 @@ void CInterfaceWelcome::renderFooter() const {
     mvprintw(m_terminalHeight - 1, m_terminalWidth - 7, "F1");
     wattroff(stdscr, A_REVERSE);
     mvprintw(m_terminalHeight-1, m_terminalWidth - 4, "HELP");
-}
-
-
-void CInterfaceWelcome::display() {
-    clear();
-    updateTerminalSize();
-    renderHeader();
-    renderBody();
-    renderFooter();
-}
-
-MenuOption CInterfaceWelcome::getSelected() const {
-    switch (m_selected) {
-        case 0:
-            return MenuOption::Create;
-        case 1:
-            return MenuOption::Load;
-        case 2:
-            return MenuOption::Exit;
-        default:
-            return MenuOption::Create;
-    }
 }

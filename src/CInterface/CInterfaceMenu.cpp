@@ -1,5 +1,8 @@
 #include "CInterfaceMenu.h"
 
+CInterfaceMenu::CInterfaceMenu() 
+: CInterfaceController() {}
+
 void CInterfaceMenu::reset() {
     m_selected = 0;
 }
@@ -21,6 +24,31 @@ void CInterfaceMenu::action(int actKey) {
     }
 }
 
+void CInterfaceMenu::display() {
+    updateTerminalSize();
+    clear();
+    reset();
+    renderHeader();
+    renderBody();
+    renderFooter();
+}
+
+MenuOption CInterfaceMenu::getSelected() const {
+    switch (m_selected) {
+        case 0:
+            return MenuOption::Create;
+        case 1:
+            return MenuOption::Load;
+        case 2:
+            return MenuOption::Save;
+        case 3:
+            return MenuOption::Save_as;
+        case 4:
+            return MenuOption::Exit;
+        default:
+            return MenuOption::Exit;
+    }
+}
 
 void CInterfaceMenu::renderHeader() const {
     mvprintw(0, 0, "Create, Open or Save table!");
@@ -48,30 +76,4 @@ void CInterfaceMenu::renderFooter() const {
     mvprintw(m_terminalHeight - 1, m_terminalWidth - 7, "F1");
     wattroff(stdscr, A_REVERSE);
     mvprintw(m_terminalHeight-1, m_terminalWidth - 4, "HELP");
-}
-
-
-void CInterfaceMenu::display() {
-    updateTerminalSize();
-    clear();
-    renderHeader();
-    renderBody();
-    renderFooter();
-}
-
-MenuOption CInterfaceMenu::getSelected() const {
-    switch (m_selected) {
-        case 0:
-            return MenuOption::Create;
-        case 1:
-            return MenuOption::Load;
-        case 2:
-            return MenuOption::Save;
-        case 3:
-            return MenuOption::Save_as;
-        case 4:
-            return MenuOption::Exit;
-        default:
-            return MenuOption::Exit;
-    }
 }

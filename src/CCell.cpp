@@ -1,20 +1,22 @@
 #include "CCell.h"
 
-CCell::CCell(Position position, CTable* table) 
-: m_position(position), m_table(table) {
+CCell::CCell(Position& position, CTable* table) {
+    m_position = position;
+    m_table = table;
     m_error = true;
 }
 
 CCell::CCell(Position& position,
              std::string & expression,
              std::string & value,
-             CTable* table) 
-: m_position(position), 
-  m_expression(expression), 
-  m_value(value), 
-  m_table(table) {
+             CTable* table) {
+    m_position = position;
+    m_expression = expression;
+    m_value = value;
+    m_table = table;
     m_error = true;
 }
+
 
 void CCell::update(std::string & expression) {
     m_expression = expression;
@@ -63,7 +65,50 @@ void CCell::update(std::string & expression) {
     }
 }
 
-bool CCell::checkLoop(Position rootPosition, std::set<Position> & visitedCells) {
+void CCell::forceChange(bool error, const std::string& value, DataType valueType, std::set<Position> & visitedCells) {
+    if (visitedCells.find(m_position) == visitedCells.end()) {
+        visitedCells.insert(m_position);
+        
+        m_error = error;
+        m_value = value;
+        m_type = valueType;
+
+        for (const Position & cellPos: m_usedByCells)
+            m_table->getCell(cellPos)->forceChange(error, value, valueType, visitedCells);
+    }
+}
+
+void CCell::addDependence(const Position& cell) {
+    m_usedByCells.insert(cell);
+}
+
+void CCell::delDependence(const Position& cell) {
+    m_usedByCells.erase(cell);
+}
+
+
+Position CCell::getPosition() const {
+    return m_position;
+}
+
+const bool CCell::getErrorStatus() const {
+    return m_error;
+}
+
+std::string CCell::getValString() const {
+    return m_value;
+}
+
+DataType CCell::getValType() const {
+    return m_type;
+}
+
+std::string CCell::getExpression() const {
+    return m_expression;
+}
+
+
+const bool CCell::checkLoop(Position& rootPosition, std::set<Position> & visitedCells) const {
     if (m_usesCells.find(rootPosition) != m_usesCells.end())
         return false;
     if (visitedCells.find(m_position) == visitedCells.end()) {
@@ -85,45 +130,4 @@ void CCell::recalc() {
 
     for (const Position & cellPos: m_usedByCells)
         m_table->getCell(cellPos)->recalc();
-}
-
-void CCell::forceChange(bool error, std::string value, DataType valueType, std::set<Position> & visitedCells) {
-    if (visitedCells.find(m_position) == visitedCells.end()) {
-        visitedCells.insert(m_position);
-        
-        m_error = error;
-        m_value = value;
-        m_type = valueType;
-
-        for (const Position & cellPos: m_usedByCells)
-            m_table->getCell(cellPos)->forceChange(error, value, valueType, visitedCells);
-    }
-}
-
-void CCell::addDependence(Position cell) {
-    m_usedByCells.insert(cell);
-}
-
-void CCell::delDependence(Position cell) {
-    m_usedByCells.erase(cell);
-}
-
-Position CCell::getPosition() const {
-    return m_position;
-}
-
-bool CCell::getErrorStatus() const {
-    return m_error;
-}
-
-std::string CCell::getValString() const {
-    return m_value;
-}
-
-DataType CCell::getValType() const {
-    return m_type;
-}
-
-std::string CCell::getExpression() const {
-    return m_expression;
 }

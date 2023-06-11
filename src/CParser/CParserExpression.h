@@ -13,7 +13,7 @@ public:
 
     void process() override;
 
-    bool haveError() const;
+    const bool haveError() const;
 
     std::string getResValue() const;
 

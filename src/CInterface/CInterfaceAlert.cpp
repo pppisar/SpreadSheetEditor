@@ -1,9 +1,19 @@
 #include "CInterfaceAlert.h"
 
+CInterfaceAlert::CInterfaceAlert()
+: CInterfaceController() {}
+
 void CInterfaceAlert::reset() { }
 
 void CInterfaceAlert::action(int actKey) { }
 
+void CInterfaceAlert::display() {
+    updateTerminalSize();
+    clear();
+    renderHeader();
+    renderBody();
+    renderFooter();
+}
 
 void CInterfaceAlert::renderHeader() const {
     mvprintw(0, 0, "The terminal size is too small!");
@@ -21,13 +31,4 @@ void CInterfaceAlert::renderBody() const {
 void CInterfaceAlert::renderFooter() const {
     mvprintw(8, 0, "Change the size of the terminal");
     mvprintw(9, 0, "to the minimum allowable values!");
-}
-
-
-void CInterfaceAlert::display() {
-    updateTerminalSize();
-    clear();
-    renderHeader();
-    renderBody();
-    renderFooter();
 }

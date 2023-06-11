@@ -6,7 +6,7 @@
 
 class CInterfaceHelp : public CInterfaceController {
 public:
-    CInterfaceHelp() = default;
+    CInterfaceHelp();
 
     virtual ~CInterfaceHelp() = default;
 
@@ -19,11 +19,11 @@ public:
     void display() override;
 
 protected:
-    int m_selected = 0;
-
     void renderHeader() const override;
     void renderBody() const override;
     void renderFooter() const override;
+
+    int m_selected = 0;
 };
 
 

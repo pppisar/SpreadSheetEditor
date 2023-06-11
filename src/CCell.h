@@ -3,6 +3,7 @@
 
 #include "CConstants.h"
 #include "CParser/CParserExpression.h"
+
 #include <string>
 #include <vector>
 #include <set>
@@ -10,7 +11,7 @@
 
 class CCell {
 public:
-    CCell(Position position, CTable* table);
+    CCell(Position& position, CTable* table);
 
     CCell(Position& position,
           std::string & expression,
@@ -19,23 +20,23 @@ public:
 
     ~CCell() = default;
 
+
+    // Setters
+
     void update(std::string & expression);
 
-    bool checkLoop(Position rootPosition, std::set<Position> & visitedCells);
+    void forceChange(bool error, const std::string& value, DataType valueType, std::set<Position> & visitedCells);
 
-    void recalc();
+    void addDependence(const Position& cell);
 
-    void forceChange(bool error, std::string value, DataType valueType, std::set<Position> & visitedCells);
+    void delDependence(const Position& cell);
 
-    void addDependence(Position cell);
-
-    void delDependence(Position cell);
 
     // Getters
 
     Position getPosition() const;
 
-    bool getErrorStatus() const;
+    const bool getErrorStatus() const;
 
     std::string getValString() const;
 
@@ -56,5 +57,9 @@ private:
 
     // Who refers to this cell.
     std::set<Position> m_usedByCells;
+private:
+    const bool checkLoop(Position& rootPosition, std::set<Position> & visitedCells) const;
+
+    void recalc();
 };
 #endif //PYSAROLE_CCELL_H

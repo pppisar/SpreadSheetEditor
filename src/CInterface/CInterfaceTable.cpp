@@ -34,6 +34,24 @@ void CInterfaceTable::action(int actKey) {
     }
 }
 
+void CInterfaceTable::display() {
+    updateTerminalSize();
+    clear();
+    m_tableHeight = m_terminalHeight - HEADER_HEIGHT - FOOTER_HEIGHT;
+    m_rowCount = (m_tableHeight - CELL_HEIGHT) / CELL_HEIGHT;
+    m_columnCount = (m_terminalWidth - CELL_WIDTH/2) / CELL_WIDTH;
+    if (m_startX + m_columnCount > 25)
+        m_startX = 25 - m_columnCount + 1;
+    if (m_startY + m_rowCount > 99)
+        m_startY = 99 - m_rowCount + 1;
+    m_posX = m_posY = 0;
+    m_realX = m_startX + m_posX;
+    m_realY = m_startY + m_posY;
+    renderHeader();
+    renderBody();
+    renderFooter();
+}
+
 void CInterfaceTable::renderHeader() const {
     std::string expression = " ";
     std::string value = " ";
@@ -68,6 +86,67 @@ void CInterfaceTable::renderHeader() const {
     // Border
     move(4, 0);
     hline(0, m_terminalWidth);
+}
+
+void CInterfaceTable::renderBody() const {
+    renderGrid();
+    renderRCTitle();
+    renderCells();
+}
+
+void CInterfaceTable::renderFooter() const {
+    move(m_terminalHeight-2, 0);
+    hline(0, m_terminalWidth);
+
+    move(m_terminalHeight-1, 0);
+    clrtoeol();
+
+    std::string fileName;
+    if (m_table->isChanged())
+        fileName += "*";
+
+    if(m_table->isNamed()) {
+        if (m_table->getName().second == FileType::Binary)
+            fileName += m_table->getName().first + ".bin";
+        else
+            fileName += m_table->getName().first + ".txt";
+    }
+
+    if (fileName.length() > (MIN_WIDTH - 25))
+        mvprintw(m_terminalHeight - 1, 0, "Name: %.17s...", fileName.c_str());
+    else
+        mvprintw(m_terminalHeight - 1, 0, "Name: %s", fileName.c_str());
+
+    wattron(stdscr, A_REVERSE);
+    mvprintw(m_terminalHeight - 1, m_terminalWidth-18, "F1");
+    mvprintw(m_terminalHeight - 1, m_terminalWidth-10, "|");
+    mvprintw(m_terminalHeight - 1, m_terminalWidth-8, "ESC");
+    wattroff(stdscr, A_REVERSE);
+    mvprintw(m_terminalHeight-1, m_terminalWidth-15, "HELP");
+    mvprintw(m_terminalHeight-1, m_terminalWidth-4, "MENU");
+}
+
+void CInterfaceTable::changePosition(int x, int y) {
+    if (m_posX + x > m_columnCount - 2)
+        m_startX++;
+    else if (m_posX + x < 0 && m_startX > 0)
+        m_startX--;
+    else if (m_posY + y > m_rowCount - 2)
+        m_startY++;
+    else if (m_posY + y < 0 && m_startY > 0)
+        m_startY--;
+    else {
+        if(m_posX + x >= 0)
+            m_posX += x;
+        if(m_posY + y >= 0)
+            m_posY += y;
+    }
+    m_realX = m_startX + m_posX;
+    m_realY = m_startY + m_posY;
+    renderHeader();
+    renderGrid();
+    renderRCTitle();
+    renderCells();
 }
 
 void CInterfaceTable::renderGrid() const {
@@ -169,66 +248,6 @@ void CInterfaceTable::renderCells() const {
     }
 }
 
-void CInterfaceTable::renderBody() const {
-    renderGrid();
-    renderRCTitle();
-    renderCells();
-}
-
-void CInterfaceTable::renderFooter() const {
-    move(m_terminalHeight-2, 0);
-    hline(0, m_terminalWidth);
-
-    wattron(stdscr, A_REVERSE);
-    mvprintw(m_terminalHeight - 1, m_terminalWidth-18, "F1");
-    mvprintw(m_terminalHeight - 1, m_terminalWidth-10, "|");
-    mvprintw(m_terminalHeight - 1, m_terminalWidth-8, "ESC");
-    wattroff(stdscr, A_REVERSE);
-    mvprintw(m_terminalHeight-1, m_terminalWidth-15, "HELP");
-    mvprintw(m_terminalHeight-1, m_terminalWidth-4, "MENU");
-}
-
-void CInterfaceTable::display() {
-    updateTerminalSize();
-    clear();
-    m_tableHeight = m_terminalHeight - HEADER_HEIGHT - FOOTER_HEIGHT;
-    m_rowCount = (m_tableHeight - CELL_HEIGHT) / CELL_HEIGHT;
-    m_columnCount = (m_terminalWidth - CELL_WIDTH/2) / CELL_WIDTH;
-    if (m_startX + m_columnCount > 25)
-        m_startX = 25 - m_columnCount + 1;
-    if (m_startY + m_rowCount > 99)
-        m_startY = 99 - m_rowCount + 1;
-    m_posX = m_posY = 0;
-    m_realX = m_startX + m_posX;
-    m_realY = m_startY + m_posY;
-    renderHeader();
-    renderBody();
-    renderFooter();
-}
-
-void CInterfaceTable::changePosition(int x, int y) {
-    if (m_posX + x > m_columnCount - 2)
-        m_startX++;
-    else if (m_posX + x < 0 && m_startX > 0)
-        m_startX--;
-    else if (m_posY + y > m_rowCount - 2)
-        m_startY++;
-    else if (m_posY + y < 0 && m_startY > 0)
-        m_startY--;
-    else {
-        if(m_posX + x >= 0)
-            m_posX += x;
-        if(m_posY + y >= 0)
-            m_posY += y;
-    }
-    m_realX = m_startX + m_posX;
-    m_realY = m_startY + m_posY;
-    renderHeader();
-    renderGrid();
-    renderRCTitle();
-    renderCells();
-}
-
 void CInterfaceTable::editCell(unsigned startY, unsigned startX) {
     std::string buffer;
 
@@ -242,6 +261,7 @@ void CInterfaceTable::editCell(unsigned startY, unsigned startX) {
 
     renderHeader();
     renderCells();
+    renderFooter();
 }
 
 std::string CInterfaceTable::numToAlpha(int num) const {

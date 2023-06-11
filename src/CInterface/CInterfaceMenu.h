@@ -6,7 +6,7 @@
 
 class CInterfaceMenu : public CInterfaceController {
 public:
-    CInterfaceMenu() = default;
+    CInterfaceMenu();
 
     virtual ~CInterfaceMenu() = default;
 

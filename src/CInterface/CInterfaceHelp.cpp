@@ -1,5 +1,8 @@
 #include "CInterfaceHelp.h"
 
+CInterfaceHelp::CInterfaceHelp() 
+:CInterfaceController() { }
+
 void CInterfaceHelp::reset() {
     m_selected = 0;
 }
@@ -21,6 +24,15 @@ void CInterfaceHelp::action(int actKey) {
         default:
             break;
     }
+}
+
+void CInterfaceHelp::display() {
+    updateTerminalSize();
+    clear();
+    reset();
+    renderHeader();
+    renderBody();
+    renderFooter();
 }
 
 void CInterfaceHelp::renderHeader() const {
@@ -57,12 +69,3 @@ void CInterfaceHelp::renderFooter() const {
     mvprintw(m_terminalHeight-1, m_terminalWidth - 12, "or");
     mvprintw(m_terminalHeight-1, m_terminalWidth - 5, "CLOSE");
 }
-
-void CInterfaceHelp::display() {
-    updateTerminalSize();
-    clear();
-    renderHeader();
-    renderBody();
-    renderFooter();
-}
-

@@ -1,17 +1,15 @@
 #ifndef PYSAROLE_CTABLE_H
 #define PYSAROLE_CTABLE_H
 
-#include <map>
-
 #include "CConstants.h"
+
+#include <map>
 
 class CCell;
 
 class CTable {
 public:
-    CTable() = default;
-
-    CTable(const CTable & src);
+    CTable();
 
     virtual ~CTable();
 
@@ -20,13 +18,13 @@ public:
 
     void createCell(Position position);
 
-    void addCell(Position & position, 
+    void addCell(Position& position, 
                  std::string & expression, 
                  std::string & value);
 
     void setChange(bool isChanged);
 
-    void setNamed(bool isNamed);
+    void setName(const FileName& fileName);
     
     void evaluateDependences(); 
 
@@ -35,17 +33,19 @@ public:
 
     const std::map<Position, CCell*> & getTable() const;
 
-    CCell * getCell(Position position) const;
+    CCell * getCell(const Position& position) const;
 
-    bool checkCell(Position position) const;
+    const bool checkCell(const Position& position) const;
 
-    bool isNamed() const;
+    FileName getName() const;
 
-    bool isChanged() const;
+    const bool isNamed() const;
+
+    const bool isChanged() const;
 private:
-    bool m_isNamed = false;
-    bool m_isChanged = false;
-
+    bool m_isNamed;
+    bool m_isChanged;
+    FileName m_fileName;
     std::map<Position, CCell*> m_table;
 };
 

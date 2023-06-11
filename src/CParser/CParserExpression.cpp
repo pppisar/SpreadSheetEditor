@@ -262,7 +262,7 @@ void CParserExpression::process() {
     }
 }
 
-bool CParserExpression::haveError() const {
+const bool CParserExpression::haveError() const {
     return m_error;
 }
 

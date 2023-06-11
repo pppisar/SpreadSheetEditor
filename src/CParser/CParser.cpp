@@ -1,8 +1,8 @@
 #include "CParser.h"
 
-CParser::CParser(CTable* table, std::string expression) {
-    m_table = table;
+CParser::CParser(CTable* table, std::string& expression) {
     m_expression = expression;
+    m_table = table;
 }
 
 void CParser::toUpperCase(std::string& text) {
@@ -22,7 +22,7 @@ bool CParser::isFunction(const std::string& funcName) const {
             funcName == "LN" || funcName == "EXP");
 }
 
-bool CParser::isNumeric(std::string & value) const {
+bool CParser::isNumeric(const std::string & value) const {
     std::istringstream iss(value);
     double numVal;
     iss >> std::noskipws >> numVal;
@@ -42,7 +42,7 @@ bool CParser::isValidCell(const std::string& cell) const {
     return std::regex_match(cell, pattern);
 }
 
-Position CParser::getCellPosition(std::string link) const {
+Position CParser::getCellPosition(const std::string& link) const {
     int y = 0, x = 0;
 
     int i = 0;
@@ -54,7 +54,7 @@ Position CParser::getCellPosition(std::string link) const {
     return std::make_pair(x - 1, y);
 }
 
-unsigned CParser::getPriority(std::string op) const {
+unsigned CParser::getPriority(const std::string& op) const {
     if (op == "+" || op == "-")
         return 1;
     else if (op == "*" || op == "/")
@@ -65,17 +65,17 @@ unsigned CParser::getPriority(std::string op) const {
         return 0;
 }
 
-std::string CParser::repeatString(std::string text, int n) const {
+std::string CParser::repeatString(const std::string& text, int n) const {
     std::string resText;
     for (int i = 0; i < n; i++)
         resText += text;
     return resText;
 }
 
-bool CParser::execOperation(COperation& op,
-                            CValue& argument1,
-                            CValue& argument2,
-                            CValue& resEval) {
+bool CParser::execOperation(const COperation& op,
+                            const CValue& argument1,
+                            const CValue& argument2,
+                            CValue& resEval) const {
     bool error = false;
     DataType resType = DataType::String;
     std::string resValue;
@@ -186,9 +186,9 @@ bool CParser::execOperation(COperation& op,
     return error;
 }
 
-bool CParser::execFunction(COperation& op, 
-                           CValue& argument,
-                           CValue& resEval) {
+bool CParser::execFunction(const COperation& op, 
+                           const CValue& argument,
+                           CValue& resEval) const {
     bool error = false;
     std::string resValue;
     DataType resType = argument.type;
