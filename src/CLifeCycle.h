@@ -17,12 +17,20 @@
 #include <ncurses.h>
 #include <filesystem>
 
+/**
+ * Responsible for managing the entire program. 
+ * It changes the interface, saves tables, and accepts input from the user.
+*/
+
 class CLifeCycle {
 public:
     CLifeCycle();
 
     ~CLifeCycle();
 
+    /**
+     * Method with the main loop of the program.
+    */
     void run();
 private:
     std::string m_path = "examples/";
@@ -43,14 +51,34 @@ private:
     int m_terminalWidth;
     int m_terminalHeight;
 private:
+    /**
+     * Changes the display of the interface according to the user's selection.
+     * @param[in] screen - The corresponding screen that was selected
+    */
     void changeScreen(Screen screen);
 
+    /**
+     * Checks if the entered file name is correct
+     * @return Returns the result of the check (true/false)
+    */
     const bool validateFileName() const;
 
+    /**
+     * Saves the table to the specified file
+     * The specified file is completely overwritten
+     * @return Returns true if overwritten successfully, false otherwise
+    */
     const bool saveFile();
 
+    /**
+     * Loads a table from the specified file
+     * @return Returns true if the table is loaded successfully, otherwise - false
+    */
     const bool loadFile();
 
+    /**
+     * Writes an error message to the footer
+    */
     void errorMessage(std::string message);
 };
 #endif //PYSAROLE_CLIFECYCLE_H
