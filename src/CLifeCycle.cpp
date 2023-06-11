@@ -100,13 +100,12 @@ void CLifeCycle::run() {
                                     break;
                                 case MenuOption::Load:
                                     m_fileName = m_welcomeInterface->getFileName("Load");
-                                    if (m_fileName.second == FileType::Binary) {
-                                        CStateBinary stateManager(m_table, m_fileName.first, m_path);
-                                        if(stateManager.load()) {
-                                            m_table->setName(m_fileName);
-                                            changeScreen(Screen::Table);
-                                        }
+                                    if (validateFileName() && loadFile()) {
+                                        m_table->setName(m_fileName);
+                                        changeScreen(Screen::Table);
                                     }
+                                    else
+                                        errorMessage("Can't load the file");
                                     break;
                                 case MenuOption::Exit:
                                     return;
@@ -117,92 +116,65 @@ void CLifeCycle::run() {
                         else if (m_currentScreen == Screen::Menu) {
                             switch (m_menuInterface->getSelected()) {
                                 case MenuOption::Create:
-                                    changeScreen(Screen::Table);
+                                    if (m_table->isChanged() && !m_table->isNamed()) 
+                                        m_fileName = m_welcomeInterface->getFileName("Save");
+                                    if ((m_table->isChanged() && validateFileName() && saveFile())
+                                        || !m_table->isChanged()) {
+                                        m_table->reset();
+                                        m_tableInterface->reset();
+                                        changeScreen(Screen::Table);
+                                    }
+                                    else
+                                        errorMessage("Can't save previous file");
                                     break;
                                 case MenuOption::Load:
                                     if(m_table->isChanged() &&  !m_table->isNamed())
                                         m_fileName = m_menuInterface->getFileName("Save");
-                                    if(m_table->isChanged()) {
-                                        if (m_fileName.second == FileType::Binary) {
-                                            CStateBinary stateManager(m_table, m_fileName.first, m_path);
-                                            if (stateManager.save()) {
-                                                m_table->setChange(false);
-                                                changeScreen(Screen::Table);
-                                            }
-                                            else {
-                                                move(m_terminalHeight - 2, 0);
-                                                clrtoeol();
-                                                move(m_terminalHeight - 1, 0);
-                                                clrtoeol();
-
-                                                mvprintw(m_terminalHeight - 1, 0, "Something goes wrong!");
-                                                getch();
-                                                m_menuInterface->display();
-                                            }
-                                        }
-                                    }
-                                    m_fileName = m_welcomeInterface->getFileName("Load");
-                                    if (m_fileName.second == FileType::Binary) {
-                                        CStateBinary stateManager(m_table, m_fileName.first, m_path);
-                                        if(stateManager.load()) {
+                                    if((m_table->isChanged() && validateFileName() && saveFile())
+                                        || !m_table->isChanged()) {
+                                        m_table->setName(m_fileName);
+                                        m_fileName = m_welcomeInterface->getFileName("Load");
+                                        if (validateFileName() && loadFile()) {
                                             m_table->setName(m_fileName);
                                             changeScreen(Screen::Table);
                                         }
+                                        else
+                                            errorMessage("Can't load the file");
                                     }
-                                    changeScreen(Screen::Table);
+                                    else
+                                        errorMessage("Can't previous the file");
                                     break;
                                 case MenuOption::Save:
-                                    if(m_table->isChanged() &&  !m_table->isNamed()) {
-                                        m_fileName = m_menuInterface->getFileName("Save");
+                                    if (m_table->isChanged() && !m_table->isNamed()) 
+                                        m_fileName = m_welcomeInterface->getFileName("Save");
+                                    if ((m_table->isChanged() && validateFileName() && saveFile())
+                                        || !m_table->isChanged()) {
                                         m_table->setName(m_fileName);
+                                        changeScreen(Screen::Table);
                                     }
-                                    if(m_table->isChanged()) {
-                                        if (m_fileName.second == FileType::Binary) {
-                                            CStateBinary stateManager(m_table, m_fileName.first, m_path);
-                                            if (stateManager.save()) {
-                                                m_table->setChange(false);
-                                                changeScreen(Screen::Table);
-                                            }
-                                            else {
-                                                move(m_terminalHeight - 2, 0);
-                                                clrtoeol();
-                                                move(m_terminalHeight - 1, 0);
-                                                clrtoeol();
-
-                                                mvprintw(m_terminalHeight - 1, 0, "Something goes wrong!");
-                                                getch();
-                                                m_menuInterface->display();
-                                            }
-                                        }
-                                    }
+                                    else
+                                        errorMessage("Can't save previous file");
                                     break;
                                 case MenuOption::Save_as:
-                                    m_fileName = m_menuInterface->getFileName("Save");
-                                    m_table->setName(m_fileName);
-                                    if (m_fileName.second == FileType::Binary) {
-                                        CStateBinary stateManager(m_table, m_fileName.first, m_path);
-                                        // TODO: if save return false => in footer write about 
-                                        // error and rerender footer after pressing of any button
-                                        if (stateManager.save()) {
-                                            m_table->setChange(false);
-                                            changeScreen(Screen::Table);
-                                        }
-                                        else {
-                                            move(m_terminalHeight - 2, 0);
-                                            clrtoeol();
-                                            move(m_terminalHeight - 1, 0);
-                                            clrtoeol();
-
-                                            mvprintw(m_terminalHeight - 1, 0, "Something goes wrong!");
-                                            getch();
-                                            m_menuInterface->display();
-                                        }
+                                    m_fileName = m_welcomeInterface->getFileName("Save");
+                                    if ((m_table->isChanged() && validateFileName() && saveFile())
+                                        || !m_table->isChanged()) {
+                                        m_table->setName(m_fileName);
+                                        changeScreen(Screen::Table);
                                     }
-                                    m_table->setChange(false);
-                                    changeScreen(Screen::Table);
+                                    else
+                                        errorMessage("Can't save previous file");
                                     break;
                                 case MenuOption::Exit:
-                                    return;
+                                    if (m_table->isChanged() && !m_table->isNamed()) 
+                                        m_fileName = m_welcomeInterface->getFileName("Save");
+                                    if ((m_table->isChanged() && validateFileName() && saveFile())
+                                        || !m_table->isChanged()) {
+                                        return;
+                                    }
+                                    else
+                                        errorMessage("Can't save previous file");
+                                    break;
                                 default:
                                     break;
                             }
@@ -221,4 +193,60 @@ void CLifeCycle::changeScreen(Screen screen) {
     m_previousScreen = m_currentScreen;
     m_currentScreen = screen;
     m_allScreens[screen]->display();
+}
+
+const bool CLifeCycle::validateFileName() const {
+    std::string invalidChars = "(\\/*:?<>|\"')";
+    for (char c : m_fileName.first) {
+        if (invalidChars.find(c) != std::string::npos)
+            return false;
+    }
+    if (std::filesystem::path(m_fileName.first).has_extension())
+        return false;
+
+    if (std::filesystem::path(m_fileName.first).has_parent_path())
+        return false;
+
+    return true;
+}
+
+const bool CLifeCycle::saveFile() {
+    if (m_fileName.second == FileType::Binary) {
+        CStateBinary stateManager(m_table, m_fileName.first, m_path);
+        if (!stateManager.save())
+            return false;
+    }
+    else {
+        CStateTxt stateManager(m_table, m_fileName.first, m_path);
+        if (!stateManager.save())
+            return false;
+    }
+    return true;
+}
+
+const bool CLifeCycle::loadFile() {
+    if (m_fileName.second == FileType::Binary) {
+        CStateBinary stateManager(m_table, m_fileName.first, m_path);
+        if (!stateManager.load())
+            return false;
+    }
+    else {
+        CStateTxt stateManager(m_table, m_fileName.first, m_path);
+        if (!stateManager.load())
+            return false;
+    }
+    return true;
+}
+
+void CLifeCycle::errorMessage(std::string message) {
+        move(m_terminalHeight - 2, 0);
+        clrtoeol();
+        mvprintw(m_terminalHeight - 2, 0, "%s", message.c_str());
+
+        move(m_terminalHeight - 1, 0);
+        clrtoeol();
+        mvprintw(m_terminalHeight - 1, 0, "Press any button to continue");
+
+        getch();
+        m_allScreens[m_currentScreen]->display();
 }

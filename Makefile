@@ -13,7 +13,7 @@ compile: $(OBJS)
 	@mkdir -p build/CInterface
 	@mkdir -p build/CParser
 	@mkdir -p build/CState
-	$(LD) $(CXXFLAGS) -o build/EXE $(OBJS) $(LIBS)
+	$(LD) $(CXXFLAGS) -o pysarole $(OBJS) $(LIBS)
 
 build/%.o: src/%.cpp
 	@mkdir -p build
@@ -24,7 +24,7 @@ build/%.o: src/%.cpp
 
 
 run:
-	./build/EXE
+	./pysarole
 
 clean:
 	rm -rf build

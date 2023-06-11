@@ -25,6 +25,8 @@ public:
 
     void update(std::string & expression);
 
+    void updateDependences();
+
     void forceChange(bool error, const std::string& value, DataType valueType, std::set<Position> & visitedCells);
 
     void addDependence(const Position& cell);

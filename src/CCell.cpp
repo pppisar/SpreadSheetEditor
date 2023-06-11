@@ -65,6 +65,10 @@ void CCell::update(std::string & expression) {
     }
 }
 
+void CCell::updateDependences() {
+    
+}
+
 void CCell::forceChange(bool error, const std::string& value, DataType valueType, std::set<Position> & visitedCells) {
     if (visitedCells.find(m_position) == visitedCells.end()) {
         visitedCells.insert(m_position);

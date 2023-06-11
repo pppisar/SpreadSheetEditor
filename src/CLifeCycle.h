@@ -10,10 +10,12 @@
 #include "CInterface/CInterfaceMenu.h"
 #include "CInterface/CInterfaceTable.h"
 #include "CState/CStateBinary.h"
+#include "CState/CStateTxt.h"
 
 #include <map>
 #include <string>
 #include <ncurses.h>
+#include <filesystem>
 
 class CLifeCycle {
 public:
@@ -42,5 +44,13 @@ private:
     int m_terminalHeight;
 private:
     void changeScreen(Screen screen);
+
+    const bool validateFileName() const;
+
+    const bool saveFile();
+
+    const bool loadFile();
+
+    void errorMessage(std::string message);
 };
 #endif //PYSAROLE_CLIFECYCLE_H

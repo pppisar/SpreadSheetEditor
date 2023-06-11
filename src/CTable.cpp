@@ -11,6 +11,15 @@ CTable::~CTable() {
         delete it.second;
 }
 
+void CTable::reset() {
+    m_isNamed = false;
+    m_isChanged = false;
+    for (auto & it: m_table)
+        delete it.second;
+    m_table.clear();
+}
+
+
 // Setters
 
 void CTable::createCell(Position position) {
@@ -36,10 +45,12 @@ void CTable::setChange(bool isChanged) {
 void CTable::setName(const FileName& fileName) {
     m_fileName = fileName;
     m_isNamed = true;
+    m_isChanged = false;
 }
 
 void CTable::evaluateDependences() {
-    
+    for (auto & it: m_table)
+        it.second->updateDependences();
 }
 
 

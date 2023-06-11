@@ -32,6 +32,7 @@ bool CStateBinary::load() {
     if (!file.good())
         return false;
 
+    m_table->reset();
     std::string line;
 
     while (getline(file, line)) {

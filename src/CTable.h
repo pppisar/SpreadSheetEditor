@@ -13,6 +13,7 @@ public:
 
     virtual ~CTable();
 
+    void reset();
 
     // Setters
 
