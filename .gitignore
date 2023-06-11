@@ -1,4 +1,9 @@
-build
-.vscode
+.vscode/
+
+build/
+doc/
+examples/
+
 CMakeLists.txt
-examples
+
+

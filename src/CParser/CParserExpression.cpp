@@ -222,6 +222,43 @@ void CParserExpression::process() {
                 break;
             }
         }
+
+        if (values.empty()) {
+            m_error = true;
+            if (!operations.empty())
+                m_resValue = "BadSynt13";
+        }
+        else if (prevIsOper) {
+            m_error = true;
+            m_resValue = "BadSynt14";
+        }
+            
+        if(!m_error) {
+            while(!operations.empty() && operations.top().operation != "(" && !isFunction(operations.top().operation)) {
+                COperation op = operations.top();
+                operations.pop();
+                CValue val2 = values.top();
+                values.pop();
+                CValue val1 = values.top();
+                values.pop();
+                CValue resEval;
+                if (!execOperation(op, val1, val2, resEval))
+                    values.push(resEval);
+                else {
+                    m_error = true;
+                    m_resValue = resEval.value;
+                    break;
+                }
+            }
+            if (operations.empty() && !m_error) {
+                m_resValue =  values.top().value;
+                m_resDataType = values.top().type;
+            }
+            else if (!operations.empty() && !m_error) {
+                m_error = true;
+                m_resValue = "BadSynt12";
+            }
+        }
     }
     else if(expLength > 0) {
         if (isNumeric(m_expression)) {
@@ -230,35 +267,7 @@ void CParserExpression::process() {
             else
                 m_resDataType = DataType::Double;
         }
-        values.push(CValue(m_expression, m_resDataType));
-    }
-    if (values.empty())
-        m_error = true;
-    if(!m_error) {
-        while(!operations.empty() && operations.top().operation != "(" && !isFunction(operations.top().operation)) {
-            COperation op = operations.top();
-            operations.pop();
-            CValue val2 = values.top();
-            values.pop();
-            CValue val1 = values.top();
-            values.pop();
-            CValue resEval;
-            if (!execOperation(op, val1, val2, resEval))
-                values.push(resEval);
-            else {
-                m_error = true;
-                m_resValue = resEval.value;
-                break;
-            }
-        }
-        if (operations.empty() && !m_error) {
-            m_resValue =  values.top().value;
-            m_resDataType = values.top().type;
-        }
-        else if (!operations.empty() && !m_error) {
-            m_error = true;
-            m_resValue = "BadSynt12";
-        }
+        m_resValue = m_expression;
     }
 }
 

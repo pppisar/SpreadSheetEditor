@@ -32,7 +32,7 @@ bool CParser::isNumeric(const std::string & value) const {
 bool CParser::isInteger(const std::string& value) const {
     if (value.length() == 0)
         return false;
-    if (std::abs(std::stod(value) - std::stoi(value)) > 1e-9)
+    if (std::abs(std::stold(value) - std::stoll(value)) > 1e-9)
         return false;
     return true;
 }
@@ -49,7 +49,7 @@ Position CParser::getCellPosition(const std::string& link) const {
     for (; isalpha(link[i]); i++)
         x = x * 26 + (toupper(link[i]) - 'A' + 1);
     
-    y = std::stoi(link.substr(i));
+    y = std::stoll(link.substr(i));
     
     return std::make_pair(x - 1, y);
 }
@@ -79,108 +79,114 @@ bool CParser::execOperation(const COperation& op,
     bool error = false;
     DataType resType = DataType::String;
     std::string resValue;
-    if (op.operation == "+") {
-        if (argument1.type != DataType::String && argument2.type != DataType::String) {
-            resValue = std::to_string(std::stod(argument1.value) + std::stod(argument2.value));
-            if (isInteger(resValue)) {
-                resType = DataType::Integer;
-                resValue = std::to_string(std::stoi(resValue));
-            }
-            else
-                resType = DataType::Double;
-        }
-        else if (argument1.type == argument2.type && argument1.type == DataType::String)
-            resValue = argument1.value + argument2.value;
-        else {
-            error = true;
-            resValue = "BadOpArgs";
-        }
-    }
-    else if (op.operation == "-") {
-        if (argument1.type != DataType::String && argument2.type != DataType::String) {
-            resValue = std::to_string(std::stod(argument1.value) - std::stod(argument2.value));
-            if (isInteger(resValue)) {
-                resType = DataType::Integer;
-                resValue = std::to_string(std::stoi(resValue));
-            }
-            else
-                resType = DataType::Double;
-        }
-        else {
-            error = true;
-            resValue = "BadLogic";
-        }
-    }
-    else if (op.operation == "*") {
-        if (argument1.type != DataType::String && argument2.type != DataType::String) {
-            resValue = std::to_string(std::stod(argument1.value) * std::stod(argument2.value));
-            if (isInteger(resValue)) {
-                resType = DataType::Integer;
-                resValue = std::to_string(std::stoi(resValue));
-            }
-            else
-                resType = DataType::Double;
-        }
-        else if (argument1.type == DataType::String && argument2.type == DataType::Integer)
-            resValue = repeatString(argument1.value, std::stoi(argument2.value));
-        else if (argument1.type == DataType::Integer && argument2.type == DataType::String)
-            resValue = repeatString(argument2.value, std::stoi(argument1.value));
-        else {
-            error = true;
-            resValue = "BadLogic";
-        }
-    }
-    else if (op.operation == "/") {
-        if (argument1.type != DataType::String && argument2.type != DataType::String) {
-            if (argument2.type == DataType::Integer && stoi(argument2.value) == 0) {
-                error = true;
-                resValue = "BadLogic";
-            }
-            else {
-                resValue = std::to_string(std::stoi(argument1.value) / std::stoi(argument2.value));
+    try {
+        if (op.operation == "+") {
+            if (argument1.type != DataType::String && argument2.type != DataType::String) {
+                resValue = std::to_string(std::stold(argument1.value) + std::stold(argument2.value));
                 if (isInteger(resValue)) {
                     resType = DataType::Integer;
-                    resValue = std::to_string(std::stoi(resValue));
+                    resValue = std::to_string(std::stoll(resValue));
                 }
                 else
                     resType = DataType::Double;
             }
+            else if (argument1.type == argument2.type && argument1.type == DataType::String)
+                resValue = argument1.value + argument2.value;
+            else {
+                error = true;
+                resValue = "BadOpArgs";
+            }
         }
-        else {
-            error = true;
-            resValue = "BadLogic";
-        }
-    }
-    else if (op.operation == "^") {
-        if (argument1.type == DataType::Integer && stoi(argument1.value) == 0 && 
-            argument2.type != DataType::String && stod(argument2.value) <= 0) {
+        else if (op.operation == "-") {
+            if (argument1.type != DataType::String && argument2.type != DataType::String) {
+                resValue = std::to_string(std::stold(argument1.value) - std::stold(argument2.value));
+                if (isInteger(resValue)) {
+                    resType = DataType::Integer;
+                    resValue = std::to_string(std::stoll(resValue));
+                }
+                else
+                    resType = DataType::Double;
+            }
+            else {
                 error = true;
                 resValue = "BadLogic";
-        }
-        else if (argument1.type != DataType::String && argument2.type != DataType::String) {
-            resValue = std::to_string(pow(std::stod(argument1.value), std::stod(argument2.value)));
-            if (isInteger(resValue)) {
-                resType = DataType::Integer;
-                resValue = std::to_string(std::stoi(resValue));
             }
-            else
-                resType = DataType::Double;
         }
-        else {
-            error = true;
-            resValue = "BadLogic";
+        else if (op.operation == "*") {
+            if (argument1.type != DataType::String && argument2.type != DataType::String) {
+                resValue = std::to_string(std::stold(argument1.value) * std::stold(argument2.value));
+                if (isInteger(resValue)) {
+                    resType = DataType::Integer;
+                    resValue = std::to_string(std::stoll(resValue));
+                }
+                else
+                    resType = DataType::Double;
+            }
+            else if (argument1.type == DataType::String && argument2.type == DataType::Integer)
+                resValue = repeatString(argument1.value, std::stoll(argument2.value));
+            else if (argument1.type == DataType::Integer && argument2.type == DataType::String)
+                resValue = repeatString(argument2.value, std::stoll(argument1.value));
+            else {
+                error = true;
+                resValue = "BadLogic";
+            }
         }
+        else if (op.operation == "/") {
+            if (argument1.type != DataType::String && argument2.type != DataType::String) {
+                if (argument2.type == DataType::Integer && stoll(argument2.value) == 0) {
+                    error = true;
+                    resValue = "BadLogic";
+                }
+                else {
+                    resValue = std::to_string(std::stoll(argument1.value) / std::stoll(argument2.value));
+                    if (isInteger(resValue)) {
+                        resType = DataType::Integer;
+                        resValue = std::to_string(std::stoll(resValue));
+                    }
+                    else
+                        resType = DataType::Double;
+                }
+            }
+            else {
+                error = true;
+                resValue = "BadLogic";
+            }
+        }
+        else if (op.operation == "^") {
+            if (argument1.type == DataType::Integer && stoll(argument1.value) == 0 && 
+                argument2.type != DataType::String && stold(argument2.value) <= 0) {
+                    error = true;
+                    resValue = "BadLogic";
+            }
+            else if (argument1.type != DataType::String && argument2.type != DataType::String) {
+                resValue = std::to_string(pow(std::stold(argument1.value), std::stold(argument2.value)));
+                if (isInteger(resValue)) {
+                    resType = DataType::Integer;
+                    resValue = std::to_string(std::stoll(resValue));
+                }
+                else
+                    resType = DataType::Double;
+            }
+            else {
+                error = true;
+                resValue = "BadLogic";
+            }
+        }
+        else if (op.operation == "%") {
+            if (argument1.type == argument2.type && argument1.type == DataType::Integer) {
+                resValue = std::to_string(std::stoll(argument1.value) % std::stoll(argument2.value));
+                resType = DataType::Integer;
+            }
+            else {
+                error = true;
+                resValue = "BadLogic";
+            }
+        }
+    } catch(...) {
+        error = true;
+        resValue = "BigNumRes";
     }
-    else if (op.operation == "%") {
-        if (argument1.type == argument2.type && argument1.type == DataType::Integer) {
-            resValue = std::to_string(std::stoi(argument1.value) % std::stoi(argument2.value));
-            resType = DataType::Integer;
-        }
-        else {
-            error = true;
-            resValue = "BadLogic";
-        }
-    }
+    
     resEval.value = resValue;
     resEval.type = resType;
     return error;
@@ -192,70 +198,75 @@ bool CParser::execFunction(const COperation& op,
     bool error = false;
     std::string resValue;
     DataType resType = argument.type;
-    if (argument.type != DataType::String) {
-        if (op.operation == "ABS")
-            resValue = std::to_string(std::abs(std::stod(argument.value)));
-        else if (op.operation == "SQRT") {
-            if (std::stod(argument.value) >= 0) {
-                resValue = std::to_string(std::sqrt(std::stod(argument.value)));
+    try {
+        if (argument.type != DataType::String) {
+            if (op.operation == "ABS")
+                resValue = std::to_string(std::abs(std::stold(argument.value)));
+            else if (op.operation == "SQRT") {
+                if (std::stold(argument.value) >= 0) {
+                    resValue = std::to_string(std::sqrt(std::stold(argument.value)));
+                    if (isInteger(resValue)) {
+                        resType = DataType::Integer;
+                        resValue = std::to_string(std::stoll(resValue));
+                    }
+                    else
+                        resType = DataType::Double;
+                }
+                else {
+                    resValue = "BadOpArgs";
+                    error = true;
+                }
+            }
+            else if (op.operation == "SIN") {
+                resValue = std::to_string(std::sin(std::stold(argument.value)));
                 if (isInteger(resValue)) {
                     resType = DataType::Integer;
-                    resValue = std::to_string(std::stoi(resValue));
+                    resValue = std::to_string(std::stoll(resValue));
                 }
                 else
                     resType = DataType::Double;
             }
-            else {
-                resValue = "BadOpArgs";
-                error = true;
-            }
-        }
-        else if (op.operation == "SIN") {
-            resValue = std::to_string(std::sin(std::stod(argument.value)));
-            if (isInteger(resValue)) {
-                resType = DataType::Integer;
-                resValue = std::to_string(std::stoi(resValue));
-            }
-            else
-                resType = DataType::Double;
-        }
-        else if (op.operation == "COS") {
-            resValue = std::to_string(std::cos(std::stod(argument.value)));
-            if (isInteger(resValue)) {
-                resType = DataType::Integer;
-                resValue = std::to_string(std::stoi(resValue));
-            }
-            else
-                resType = DataType::Double;
-        }
-        else if (op.operation == "LN") {
-            if (std::stod(argument.value) > 0) {
-                resValue = std::to_string(std::log(std::stod(argument.value)));
-                    if (isInteger(resValue)) {
+            else if (op.operation == "COS") {
+                resValue = std::to_string(std::cos(std::stold(argument.value)));
+                if (isInteger(resValue)) {
                     resType = DataType::Integer;
-                    resValue = std::to_string(std::stoi(resValue));
+                    resValue = std::to_string(std::stoll(resValue));
                 }
                 else
                     resType = DataType::Double;
             }
-            else {
-                resValue = "BadOpArgs";
-                error = true;
+            else if (op.operation == "LN") {
+                if (std::stold(argument.value) > 0) {
+                    resValue = std::to_string(std::log(std::stold(argument.value)));
+                        if (isInteger(resValue)) {
+                        resType = DataType::Integer;
+                        resValue = std::to_string(std::stoll(resValue));
+                    }
+                    else
+                        resType = DataType::Double;
+                }
+                else {
+                    resValue = "BadOpArgs";
+                    error = true;
+                }
+            }
+            else if (op.operation == "EXP") {
+                resValue = std::to_string(std::exp(std::stold(argument.value)));
+                if (isInteger(resValue)) {
+                    resType = DataType::Integer;
+                    resValue = std::to_string(std::stoll(resValue));
+                }
+                else
+                    resType = DataType::Double;
             }
         }
-        else if (op.operation == "EXP") {
-            resValue = std::to_string(std::exp(std::stod(argument.value)));
-            if (isInteger(resValue)) {
-                resType = DataType::Integer;
-                resValue = std::to_string(std::stoi(resValue));
-            }
-            else
-                resType = DataType::Double;
+        else {
+            error = true;
+            resValue = "BadOpArgs";
         }
-    }
-    else {
+    } catch(...) {
         error = true;
-        resValue = "BadOpArgs";
+        resValue = "BigNumRes";
     }
     resEval.value = resValue;
     resEval.type = resType;

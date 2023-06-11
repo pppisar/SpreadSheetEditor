@@ -6,18 +6,6 @@ CCell::CCell(Position& position, CTable* table) {
     m_error = true;
 }
 
-CCell::CCell(Position& position,
-             std::string & expression,
-             std::string & value,
-             CTable* table) {
-    m_position = position;
-    m_expression = expression;
-    m_value = value;
-    m_table = table;
-    m_error = true;
-}
-
-
 void CCell::update(std::string & expression) {
     m_expression = expression;
     CParserExpression parser(m_table, expression);
@@ -48,20 +36,14 @@ void CCell::update(std::string & expression) {
     if (!m_error || !m_value.empty())
         m_table->setChange(true);
 
-    if (!m_error) {
-        std::set<Position> visitedCells;
-        if (checkLoop(m_position, visitedCells)) {
-            for (const Position & cellPos: m_usedByCells)
-                m_table->getCell(cellPos)->recalc();
-        }
-        else {
-            visitedCells.clear();
-            forceChange(true, "LoopError", DataType::String, visitedCells);
-        }
-    }
-    else {
+    std::set<Position> visitedCells;
+    if (checkLoop(m_position, visitedCells)) {
         for (const Position & cellPos: m_usedByCells)
             m_table->getCell(cellPos)->recalc();
+    }
+    else {
+        visitedCells.clear();
+        forceChange(true, "LoopError", DataType::String, visitedCells);
     }
 }
 

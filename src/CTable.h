@@ -19,10 +19,6 @@ public:
 
     void createCell(Position position);
 
-    void addCell(Position& position, 
-                 std::string & expression, 
-                 std::string & value);
-
     void setChange(bool isChanged);
 
     void setName(const FileName& fileName);

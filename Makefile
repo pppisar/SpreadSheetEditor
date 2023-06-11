@@ -1,6 +1,6 @@
 CXX = g++
 LD = g++
-CXXFLAGS = -std=c++17 -Wall -pedantic
+CXXFLAGS = -std=c++17 -Wall -pedantic -g
 LIBS = -lncurses
 
 SRC = $(wildcard src/*.cpp ) $(wildcard src/**/*.cpp)
@@ -32,8 +32,9 @@ clean:
 fsanitize:
 # Compile and run project using fsanitize
 
-valgrind:
 # Compile and run project using valgrind
+valgrind:
+	valgrind --leak-check=full ./pysarole
 
 doc:
 # Automatically generate documentation in the pysarole/doc directory with doxygen.

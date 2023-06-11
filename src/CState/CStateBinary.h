@@ -6,6 +6,8 @@
 #include "../CTable.h"
 #include "../CCell.h"
 
+#include <ncurses.h>
+
 class CStateBinary: public CStateManager {
 public:
     CStateBinary(CTable* table, std::string & fileName, std::string & path);

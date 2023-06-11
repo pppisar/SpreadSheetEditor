@@ -157,7 +157,7 @@ void CLifeCycle::run() {
                                     break;
                                 case MenuOption::Save_as:
                                     m_fileName = m_welcomeInterface->getFileName("Save");
-                                    if ((m_table->isChanged() && validateFileName() && saveFile())
+                                    if ((validateFileName() && saveFile())
                                         || !m_table->isChanged()) {
                                         m_table->setName(m_fileName);
                                         changeScreen(Screen::Table);
