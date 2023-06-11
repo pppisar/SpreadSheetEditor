@@ -19,6 +19,15 @@ void CTable::createCell(Position position) {
     }
 }
 
+void CTable::addCell(Position & position, 
+                     std::string & expression, 
+                     std::string & value) {
+    if (!checkCell(position)) {
+        CCell * cell = new CCell(position, expression, value, this);
+        m_table[position] = cell;
+    }
+}
+
 void CTable::setChange(bool isChanged) {
     m_isChanged = isChanged;
 }

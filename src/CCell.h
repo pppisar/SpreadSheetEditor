@@ -12,6 +12,11 @@ class CCell {
 public:
     CCell(Position position, CTable* table);
 
+    CCell(Position& position,
+          std::string & expression,
+          std::string & value,
+          CTable* table);
+
     ~CCell() = default;
 
     void update(std::string & expression);

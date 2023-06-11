@@ -5,6 +5,17 @@ CCell::CCell(Position position, CTable* table)
     m_error = true;
 }
 
+CCell::CCell(Position& position,
+             std::string & expression,
+             std::string & value,
+             CTable* table) 
+: m_position(position), 
+  m_expression(expression), 
+  m_value(value), 
+  m_table(table) {
+    m_error = true;
+}
+
 void CCell::update(std::string & expression) {
     m_expression = expression;
     CParserExpression parser(m_table, expression);

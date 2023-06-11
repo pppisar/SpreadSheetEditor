@@ -107,6 +107,11 @@ void CLifeCycle::run() {
                                     break;
                                 case MenuOption::Load:
                                     m_fileName = m_welcomeInterface->getFileName("Load");
+                                    if (m_fileName.second == FileType::Binary) {
+                                        CStateBinary stateManager(m_table, m_fileName.first, m_path);
+                                        if(stateManager.load())
+                                            changeScreen(Screen::Table);
+                                    }
                                     break;
                                 case MenuOption::Exit:
                                     return;
