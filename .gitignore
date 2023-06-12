@@ -5,3 +5,5 @@ doc/
 examples/
 
 CMakeLists.txt
+pysarole
+pysarole.zip

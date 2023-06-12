@@ -10,26 +10,26 @@ void CParser::toUpperCase(std::string& text) {
         text[i] = toupper(text[i]);
 }
 
-bool CParser::isOperator(char op) const {
+const bool CParser::isOperator(char op) const {
     return (op == '+' || op == '-' || 
             op == '*' || op == '/' ||  
             op == '^'||  op == '%');
 }
 
-bool CParser::isFunction(const std::string& funcName) const {
+const bool CParser::isFunction(const std::string& funcName) const {
     return (funcName == "ABS" || funcName == "SQRT" ||
             funcName == "SIN" || funcName == "COS" ||
             funcName == "LN" || funcName == "EXP");
 }
 
-bool CParser::isNumeric(const std::string & value) const {
+const bool CParser::isNumeric(const std::string & value) const {
     std::istringstream iss(value);
     double numVal;
     iss >> std::noskipws >> numVal;
     return iss.eof() && !iss.fail();
 }
 
-bool CParser::isInteger(const std::string& value) const {
+const bool CParser::isInteger(const std::string& value) const {
     if (value.length() == 0)
         return false;
     if (std::abs(std::stold(value) - std::stoll(value)) > 1e-9)
@@ -37,7 +37,7 @@ bool CParser::isInteger(const std::string& value) const {
     return true;
 }
 
-bool CParser::isValidCell(const std::string& cell) const {
+const bool CParser::isValidCell(const std::string& cell) const {
     std::regex pattern("[A-Z]+[0-9]+");
     return std::regex_match(cell, pattern);
 }
@@ -72,7 +72,7 @@ std::string CParser::repeatString(const std::string& text, int n) const {
     return resText;
 }
 
-bool CParser::execOperation(const COperation& op,
+const bool CParser::execOperation(const COperation& op,
                             const CValue& argument1,
                             const CValue& argument2,
                             CValue& resEval) const {
@@ -192,7 +192,7 @@ bool CParser::execOperation(const COperation& op,
     return error;
 }
 
-bool CParser::execFunction(const COperation& op, 
+const bool CParser::execFunction(const COperation& op, 
                            const CValue& argument,
                            CValue& resEval) const {
     bool error = false;

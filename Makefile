@@ -1,12 +1,13 @@
 CXX = g++
 LD = g++
-CXXFLAGS = -std=c++17 -Wall -pedantic -g
+CXXFLAGS = -std=c++17 -Wall -pedantic
 LIBS = -lncurses
 
+HDRS = $(wildcard src/*.h ) $(wildcard src/CInterface*.h ) $(wildcard src/CParser*.h ) $(wildcard src/CState*.h )
 SRC = $(wildcard src/*.cpp ) $(wildcard src/**/*.cpp)
 OBJS = $(patsubst src/%.cpp, build/%.o, $(SRC))
 
-all: compile run
+all: compile doc
 
 compile: $(OBJS)
 	@mkdir -p build
@@ -23,20 +24,14 @@ build/%.o: src/%.cpp
 	$(CXX) $(CXXFLAGS) -MMD -c -o $@ $<
 
 
-run:
+run: compile
 	./pysarole
 
 clean:
-	rm -rf build
-
-fsanitize:
-# Compile and run project using fsanitize
-
-# Compile and run project using valgrind
-valgrind:
-	valgrind --leak-check=full ./pysarole
+	rm -rf build/
+	rm -rf doc/
 
 doc:
-# Automatically generate documentation in the pysarole/doc directory with doxygen.
+	doxygen Doxyfile
 
 -include build/*.d
