@@ -35,13 +35,13 @@ void CParserExpression::process() {
                     }
                     else {
                         m_error = true;
-                        m_resValue = "BadSynt01";
+                        m_resValue = "BadSyntax";
                         break;
                     }
                 }
                 else {
                     m_error = true;
-                    m_resValue = "BadSynt02";
+                    m_resValue = "BadSyntax";
                     break;
                 }
             }
@@ -65,7 +65,7 @@ void CParserExpression::process() {
                 }
                 else {
                     m_error = true;
-                    m_resValue = "BadSynt03";
+                    m_resValue = "BadSyntax";
                     break;
                 }
             }
@@ -85,7 +85,7 @@ void CParserExpression::process() {
                         }
                         else {
                             m_error = true;
-                            m_resValue = "BadSynt04";
+                            m_resValue = "BadSyntax";
                             break;
                         }
                     }
@@ -110,14 +110,14 @@ void CParserExpression::process() {
                         }
                         else {
                             m_error = true;
-                            m_resValue = "BadSynt05";
+                            m_resValue = "BadSyntax";
                             break;
                         }
                     }
                 }
                 else {
                     m_error = true;
-                    m_resValue = "BadSynt06";
+                    m_resValue = "BadSyntax";
                     break;
                 }
             }
@@ -126,7 +126,7 @@ void CParserExpression::process() {
                     operations.push(COperation("(", 0));
                 else {
                     m_error = true;
-                    m_resValue = "BadSynt07";
+                    m_resValue = "BadSyntax";
                     break;
                 }
             }
@@ -153,7 +153,7 @@ void CParserExpression::process() {
                         break;
                     if (operations.empty()) {
                         m_error = true;
-                        m_resValue = "BadSynt08";
+                        m_resValue = "BadSyntax";
                         break;
                     }
                     if (isFunction(operations.top().operation)) {
@@ -173,7 +173,7 @@ void CParserExpression::process() {
                 }
                 else {
                     m_error = true;
-                    m_resValue = "BadSynt09";
+                    m_resValue = "BadSyntax";
                     break;
                 }
             }
@@ -212,13 +212,13 @@ void CParserExpression::process() {
                 }
                 else {
                     m_error = true;
-                    m_resValue = "BadSynt10";
+                    m_resValue = "BadSyntax";
                     break;
                 }
             }
             else {
                 m_error = true;
-                m_resValue = "BadSynt11";
+                m_resValue = "BadSyntax";
                 break;
             }
         }
@@ -226,11 +226,11 @@ void CParserExpression::process() {
         if (values.empty()) {
             m_error = true;
             if (!operations.empty())
-                m_resValue = "BadSynt13";
+                m_resValue = "BadSyntax";
         }
         else if (prevIsOper) {
             m_error = true;
-            m_resValue = "BadSynt14";
+            m_resValue = "BadSyntax";
         }
             
         if(!m_error) {
@@ -256,7 +256,7 @@ void CParserExpression::process() {
             }
             else if (!operations.empty() && !m_error) {
                 m_error = true;
-                m_resValue = "BadSynt12";
+                m_resValue = "BadSyntax";
             }
         }
     }

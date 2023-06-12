@@ -88,9 +88,10 @@ std::string CInterfaceController::readInputString(unsigned startY, unsigned star
     return buffer;
 }
 
-FileName CInterfaceController::getFileName(std::string forWhat) const {
+FileName CInterfaceController::getFileName(std::string forWhat) {
     std::string fileName;
     FileType type = FileType::Binary;
+    updateTerminalSize();
 
     move(m_terminalHeight - 2, 0);
     clrtoeol();

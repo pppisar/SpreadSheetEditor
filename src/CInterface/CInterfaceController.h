@@ -22,7 +22,7 @@ public:
      * @param[in] forWhat - For what enter the name of the file (Save/Load)
      * @return Returns the entered file name and its extension
     */
-    virtual FileName getFileName(std::string forWhat) const;
+    virtual FileName getFileName(std::string forWhat);
 
     /**
      * Resets the selected items on the screen

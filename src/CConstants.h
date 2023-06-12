@@ -40,7 +40,7 @@ typedef std::pair<std::string, FileType> FileName;
 
 // Minimum terminal size
 const int MIN_WIDTH = 45;
-const int MIN_HEIGTH = 18;
+const int MIN_HEIGTH = 24;
 
 // Table constants
 const unsigned CELL_WIDTH = 10;
@@ -67,17 +67,11 @@ const std::string CHOICES_MENU[5] = {
 };
 
 // Help screen menu
-const std::string CHOISE_HELP[3] = {
+const std::string CHOISE_HELP[4] = {
     "NAVIGATION",
     "EDITING",
-    "FUNCTIONS"
-};
-
-// Help screen text
-const std::string TEXT_HELP[3] = {
-    "Some text about NAVIGATION",
-    "Some text about EDITING",
-    "Some text about FUNCTIONS"
+    "FUNCTIONS",
+    "ERRORS"
 };
 
 // Help screen text

@@ -3,7 +3,6 @@ LD = g++
 CXXFLAGS = -std=c++17 -Wall -pedantic
 LIBS = -lncurses
 
-HDRS = $(wildcard src/*.h ) $(wildcard src/CInterface*.h ) $(wildcard src/CParser*.h ) $(wildcard src/CState*.h )
 SRC = $(wildcard src/*.cpp ) $(wildcard src/**/*.cpp)
 OBJS = $(patsubst src/%.cpp, build/%.o, $(SRC))
 
