@@ -109,7 +109,7 @@ const bool CParser::execOperation(const COperation& op,
             }
             else {
                 error = true;
-                resValue = "BadLogic";
+                resValue = "BadOpArgs";
             }
         }
         else if (op.operation == "*") {
@@ -128,17 +128,17 @@ const bool CParser::execOperation(const COperation& op,
                 resValue = repeatString(argument2.value, std::stoll(argument1.value));
             else {
                 error = true;
-                resValue = "BadLogic";
+                resValue = "BadOpArgs";
             }
         }
         else if (op.operation == "/") {
             if (argument1.type != DataType::String && argument2.type != DataType::String) {
                 if (argument2.type == DataType::Integer && stoll(argument2.value) == 0) {
                     error = true;
-                    resValue = "BadLogic";
+                    resValue = "BadOpArgs";
                 }
                 else {
-                    resValue = std::to_string(std::stoll(argument1.value) / std::stoll(argument2.value));
+                    resValue = std::to_string(std::stold(argument1.value) / std::stold(argument2.value));
                     if (isInteger(resValue)) {
                         resType = DataType::Integer;
                         resValue = std::to_string(std::stoll(resValue));
@@ -149,14 +149,14 @@ const bool CParser::execOperation(const COperation& op,
             }
             else {
                 error = true;
-                resValue = "BadLogic";
+                resValue = "BadOpArgs";
             }
         }
         else if (op.operation == "^") {
             if (argument1.type == DataType::Integer && stoll(argument1.value) == 0 && 
                 argument2.type != DataType::String && stold(argument2.value) <= 0) {
                     error = true;
-                    resValue = "BadLogic";
+                    resValue = "BadOpArgs";
             }
             else if (argument1.type != DataType::String && argument2.type != DataType::String) {
                 resValue = std::to_string(pow(std::stold(argument1.value), std::stold(argument2.value)));
@@ -169,17 +169,23 @@ const bool CParser::execOperation(const COperation& op,
             }
             else {
                 error = true;
-                resValue = "BadLogic";
+                resValue = "BadOpArgs";
             }
         }
         else if (op.operation == "%") {
             if (argument1.type == argument2.type && argument1.type == DataType::Integer) {
-                resValue = std::to_string(std::stoll(argument1.value) % std::stoll(argument2.value));
-                resType = DataType::Integer;
+                if (argument2.type == DataType::Integer && stoll(argument2.value) == 0) {
+                    error = true;
+                    resValue = "BadOpArgs";
+                }
+                else {
+                    resValue = std::to_string(std::stoll(argument1.value) % std::stoll(argument2.value));
+                    resType = DataType::Integer;
+                }
             }
             else {
                 error = true;
-                resValue = "BadLogic";
+                resValue = "BadOpArgs";
             }
         }
     } catch(...) {
@@ -200,8 +206,15 @@ const bool CParser::execFunction(const COperation& op,
     DataType resType = argument.type;
     try {
         if (argument.type != DataType::String) {
-            if (op.operation == "ABS")
+            if (op.operation == "ABS") {
                 resValue = std::to_string(std::abs(std::stold(argument.value)));
+                if (isInteger(resValue)) {
+                    resType = DataType::Integer;
+                    resValue = std::to_string(std::stoll(resValue));
+                }
+                else
+                    resType = DataType::Double;
+            }
             else if (op.operation == "SQRT") {
                 if (std::stold(argument.value) >= 0) {
                     resValue = std::to_string(std::sqrt(std::stold(argument.value)));

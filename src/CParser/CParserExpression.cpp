@@ -36,6 +36,7 @@ void CParserExpression::process() {
                     else {
                         m_error = true;
                         m_resValue = "BadSyntax";
+                        prevIsOper = false;
                         break;
                     }
                 }
@@ -60,6 +61,7 @@ void CParserExpression::process() {
                     else {
                         m_error = true;
                         m_resValue = "Expected\"";
+                        prevIsOper = false;
                         break;
                     }
                 }
@@ -86,6 +88,7 @@ void CParserExpression::process() {
                         else {
                             m_error = true;
                             m_resValue = "BadSyntax";
+                            prevIsOper = false;
                             break;
                         }
                     }
@@ -105,12 +108,14 @@ void CParserExpression::process() {
                             else {
                                 m_error = true;
                                 m_resValue = "BadLogic";
+                                prevIsOper = false;
                                 break;
                             }
                         }
                         else {
                             m_error = true;
                             m_resValue = "BadSyntax";
+                            prevIsOper = false;
                             break;
                         }
                     }
@@ -223,7 +228,7 @@ void CParserExpression::process() {
             }
         }
 
-        if (values.empty()) {
+        if (!m_error && values.empty()) {
             m_error = true;
             if (!operations.empty())
                 m_resValue = "BadSyntax";
