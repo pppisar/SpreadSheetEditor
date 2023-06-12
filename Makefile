@@ -1,3 +1,6 @@
+# Made with reference to the material from the laboratory:
+# https://gitlab.fit.cvut.cz/dvora124/bi-pa2-2022-23/-/tree/main/cv12
+
 CXX = g++
 LD = g++
 CXXFLAGS = -std=c++17 -Wall -pedantic

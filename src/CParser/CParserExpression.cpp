@@ -274,6 +274,9 @@ void CParserExpression::process() {
         }
         m_resValue = m_expression;
     }
+    else {
+        m_error = true;
+    }
 }
 
 const bool CParserExpression::haveError() const {
