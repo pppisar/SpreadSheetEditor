@@ -8,12 +8,12 @@ The goal of the semester project was to create an interactive application, speci
 
 ## Requirements for the functionality:
 The created table editor should:
-- be able to work with numbers and strings;
-- perform basic operations with numbers (addition, subtraction, multiplication, and division);
-- implement basic operations with strings (concatenation, repetition);
-- have at least three mathematical functions (sine, cosine, absolute value, square root);
-- display tables, their resulting values, and formulas;
-- be capable of saving the table to a readable file format and restoring the table's state from a file.
+- [X] be able to work with numbers and strings;
+- [X] perform basic operations with numbers (addition, subtraction, multiplication, and division);
+- [X] implement basic operations with strings (concatenation, repetition);
+- [X] have at least three mathematical functions (sine, cosine, absolute value, square root);
+- [X] display tables, their resulting values, and formulas;
+- [X] be capable of saving the table to a readable file format and restoring the table's state from a file.
 
 If a formula is written in a table cell, the resulting value should be updated when the cells referred to by the formula are updated. Additionally, prevention of circular references between cells should be implemented.
 
@@ -35,8 +35,8 @@ All standard operations can be nested using parentheses, and parentheses can be 
 
 
 ## Comile and run:
-- You should have ncurses installed (sudo apt-get install libncurses5-dev libncursesw5-dev);
-- To generate the documentation, you need to have doxygen installed (sudo apt-get install doxygen);
+- You should have ncurses installed (`sudo apt-get install libncurses5-dev libncursesw5-dev`);
+- To generate the documentation, you need to have doxygen installed (`sudo apt-get install doxygen`);
 - `make all` - Compile the application and generate documentation;
 - `make run` - Launch the application;
 - `make clean` - Removing all compiled files;
